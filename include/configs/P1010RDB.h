@@ -37,7 +37,7 @@
 #define CONFIG_SPL_INIT_MINIMAL
 #define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_NAND_SUPPORT
-#define CONFIG_SPL_NAND_MINIMAL
+#define CONFIG_SPL_NAND_BOOT
 #define CONFIG_SPL_FLUSH_IMAGE
 #define CONFIG_SPL_TARGET		"u-boot-with-spl.bin"
 
@@ -173,7 +173,7 @@
 #define CONFIG_SYS_NUM_ADDR_MAP		16	/* number of TLB1 entries */
 #endif
 
-#define CONFIG_SYS_MEMTEST_START	0x00000000	/* memtest works on */
+#define CONFIG_SYS_MEMTEST_START	0x00200000	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x1fffffff
 #define CONFIG_PANIC_HANG		/* do not reset board on panic */
 
@@ -739,7 +739,6 @@ extern unsigned long get_sdram_size(void);
 
 #if defined(CONFIG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	230400	/* speed to run kgdb serial port */
-#define CONFIG_KGDB_SER_INDEX	2	/* which serial port to use */
 #endif
 
 /*

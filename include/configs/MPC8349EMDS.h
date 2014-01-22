@@ -67,6 +67,7 @@
  */
 #define CONFIG_SYS_FSL_DDR2
 #ifdef CONFIG_SYS_FSL_DDR2
+#define CONFIG_SYS_FSL_DDRC_GEN2
 #define CONFIG_SYS_SPD_BUS_NUM	0
 #define SPD_EEPROM_ADDRESS1	0x52
 #define SPD_EEPROM_ADDRESS2	0x51
@@ -736,7 +737,6 @@
 
 #if defined(CONFIG_CMD_KGDB)
 #define CONFIG_KGDB_BAUDRATE	230400	/* speed of kgdb serial port */
-#define CONFIG_KGDB_SER_INDEX	2	/* which serial port to use */
 #endif
 
 /*
