@@ -427,6 +427,12 @@ void main_loop(void)
 
 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
 
+#ifndef CONFIG_SYS_GENERIC_BOARD
+	puts("Warning: Your board does not use generic board. Please read\n");
+	puts("doc/README.generic-board and take action. Boards not\n");
+	puts("upgraded by the late 2014 may break or be removed.\n");
+#endif
+
 #ifdef CONFIG_MODEM_SUPPORT
 	debug("DEBUG: main_loop:   do_mdm_init=%d\n", do_mdm_init);
 	if (do_mdm_init) {
@@ -1544,7 +1550,7 @@ int do_run (cmd_tbl_t * cmdtp, int flag, int argc, char * const argv[])
 			return 1;
 		}
 
-		if (run_command(arg, flag) != 0)
+		if (run_command_list(arg, -1, flag) != 0)
 			return 1;
 	}
 	return 0;

@@ -35,6 +35,7 @@ obj-y += net_utils.o
 obj-$(CONFIG_PHYSMEM) += physmem.o
 obj-y += qsort.o
 obj-$(CONFIG_SHA1) += sha1.o
+obj-$(CONFIG_SUPPORT_EMMC_RPMB) += sha256.o
 obj-$(CONFIG_SHA256) += sha256.o
 obj-y	+= strmhz.o
 obj-$(CONFIG_TPM) += tpm.o
@@ -60,11 +61,8 @@ obj-$(CONFIG_REGEX) += slre.o
 obj-y += string.o
 obj-y += time.o
 obj-$(CONFIG_TRACE) += trace.o
-obj-$(CONFIG_BOOTP_PXE) += uuid.o
+obj-$(CONFIG_LIB_UUID) += uuid.o
 obj-y += vsprintf.o
-obj-$(CONFIG_RANDOM_MACADDR) += rand.o
-obj-$(CONFIG_BOOTP_RANDOM_DELAY) += rand.o
-obj-$(CONFIG_CMD_LINK_LOCAL) += rand.o
+obj-$(CONFIG_LIB_RAND) += rand.o
 
-# SEE README.arm-unaligned-accesses
-$(obj)bzlib.o: CFLAGS += $(PLATFORM_NO_UNALIGNED)
+subdir-ccflags-$(CONFIG_CC_OPTIMIZE_LIBS_FOR_SPEED) += -O2

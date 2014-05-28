@@ -14,7 +14,7 @@
 #include <common.h>
 #include <spl.h>
 #include <asm/arch/sys_proto.h>
-#include <asm/sizes.h>
+#include <linux/sizes.h>
 #include <asm/emif.h>
 #include <asm/omap_common.h>
 #include <linux/compiler.h>
@@ -43,16 +43,10 @@ static void set_mux_conf_regs(void)
 		set_muxconf_regs_essential();
 		break;
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_SPL:
-#ifdef CONFIG_SYS_ENABLE_PADS_ALL
-		set_muxconf_regs_non_essential();
-#endif
 		break;
 	case OMAP_INIT_CONTEXT_UBOOT_FROM_NOR:
 	case OMAP_INIT_CONTEXT_UBOOT_AFTER_CH:
 		set_muxconf_regs_essential();
-#ifdef CONFIG_SYS_ENABLE_PADS_ALL
-		set_muxconf_regs_non_essential();
-#endif
 		break;
 	}
 }
@@ -191,7 +185,7 @@ u32 omap_sdram_size(void)
 {
 	u32 section, i, valid;
 	u64 sdram_start = 0, sdram_end = 0, addr,
-	    size, total_size = 0, trap_size = 0;
+	    size, total_size = 0, trap_size = 0, trap_start = 0;
 
 	for (i = 0; i < 4; i++) {
 		section	= __raw_readl(DMM_BASE + i*4);
@@ -200,8 +194,8 @@ u32 omap_sdram_size(void)
 		addr = section & EMIF_SYS_ADDR_MASK;
 
 		/* See if the address is valid */
-		if ((addr >= DRAM_ADDR_SPACE_START) &&
-		    (addr < DRAM_ADDR_SPACE_END)) {
+		if ((addr >= TI_ARMV7_DRAM_ADDR_SPACE_START) &&
+		    (addr < TI_ARMV7_DRAM_ADDR_SPACE_END)) {
 			size = ((section & EMIF_SYS_SIZE_MASK) >>
 				   EMIF_SYS_SIZE_SHIFT);
 			size = 1 << size;
@@ -214,12 +208,15 @@ u32 omap_sdram_size(void)
 					sdram_end = addr + size;
 			} else {
 				trap_size = size;
+				trap_start = addr;
 			}
-
 		}
-
 	}
-	total_size = (sdram_end - sdram_start) - (trap_size);
+
+	if ((trap_start >= sdram_start) && (trap_start < sdram_end))
+		total_size = (sdram_end - sdram_start) - (trap_size);
+	else
+		total_size = sdram_end - sdram_start;
 
 	return total_size;
 }
@@ -254,6 +251,7 @@ u32 get_device_type(void)
 				      (DEVICE_TYPE_MASK)) >> DEVICE_TYPE_SHIFT;
 }
 
+#if defined(CONFIG_DISPLAY_CPUINFO)
 /*
  * Print CPU information
  */
@@ -264,6 +262,8 @@ int print_cpuinfo(void)
 
 	return 0;
 }
+#endif
+
 #ifndef CONFIG_SYS_DCACHE_OFF
 void enable_caches(void)
 {

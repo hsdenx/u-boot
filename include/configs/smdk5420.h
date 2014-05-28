@@ -17,8 +17,6 @@
 #undef CONFIG_DEFAULT_DEVICE_TREE
 #define CONFIG_DEFAULT_DEVICE_TREE	exynos5420-smdk5420
 
-#define CONFIG_ARCH_DEVICE_TREE		exynos5420
-
 #define CONFIG_VAR_SIZE_SPL
 
 #define CONFIG_SYS_SDRAM_BASE		0x20000000
@@ -52,5 +50,9 @@
 #define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_IRAM_TOP - 0x800)
 
 #define CONFIG_MAX_I2C_NUM	11
+
+/* Enable FIT support and comparison */
+#define CONFIG_FIT
+#define CONFIG_FIT_BEST_MATCH
 
 #endif	/* __CONFIG_5420_H */

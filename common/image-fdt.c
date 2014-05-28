@@ -463,7 +463,7 @@ int image_setup_libfdt(bootm_headers_t *images, void *blob,
 		return -1;
 	}
 	arch_fixup_memory_node(blob);
-	if (IMAAGE_OF_BOARD_SETUP)
+	if (IMAGE_OF_BOARD_SETUP)
 		ft_board_setup(blob, gd->bd);
 	fdt_fixup_ethernet(blob);
 
@@ -486,6 +486,11 @@ int image_setup_libfdt(bootm_headers_t *images, void *blob,
 	fdt_initrd(blob, *initrd_start, *initrd_end, 1);
 	if (!ft_verify_fdt(blob))
 		return -1;
+
+#ifdef CONFIG_SOC_K2HK
+	if (IMAGE_OF_BOARD_SETUP)
+		ft_board_setup_ex(blob, gd->bd);
+#endif
 
 	return 0;
 }

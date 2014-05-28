@@ -57,13 +57,18 @@ struct lmb;
 #  ifdef CONFIG_SPL_SHA1_SUPPORT
 #   define IMAGE_ENABLE_SHA1	1
 #  endif
+#  ifdef CONFIG_SPL_SHA256_SUPPORT
+#   define IMAGE_ENABLE_SHA256	1
+#  endif
 # else
 #  define CONFIG_CRC32		/* FIT images need CRC32 support */
 #  define CONFIG_MD5		/* and MD5 */
 #  define CONFIG_SHA1		/* and SHA1 */
+#  define CONFIG_SHA256		/* and SHA256 */
 #  define IMAGE_ENABLE_CRC32	1
 #  define IMAGE_ENABLE_MD5	1
 #  define IMAGE_ENABLE_SHA1	1
+#  define IMAGE_ENABLE_SHA256	1
 # endif
 
 #ifndef IMAGE_ENABLE_CRC32
@@ -76,6 +81,10 @@ struct lmb;
 
 #ifndef IMAGE_ENABLE_SHA1
 #define IMAGE_ENABLE_SHA1	0
+#endif
+
+#ifndef IMAGE_ENABLE_SHA256
+#define IMAGE_ENABLE_SHA256	0
 #endif
 
 #endif /* CONFIG_FIT */
@@ -99,9 +108,9 @@ struct lmb;
 #endif
 
 #ifdef CONFIG_OF_BOARD_SETUP
-# define IMAAGE_OF_BOARD_SETUP		1
+# define IMAGE_OF_BOARD_SETUP		1
 #else
-# define IMAAGE_OF_BOARD_SETUP		0
+# define IMAGE_OF_BOARD_SETUP		0
 #endif
 
 /*
@@ -157,6 +166,7 @@ struct lmb;
 #define IH_ARCH_NDS32	        20	/* ANDES Technology - NDS32  */
 #define IH_ARCH_OPENRISC        21	/* OpenRISC 1000  */
 #define IH_ARCH_ARM64		22	/* ARM64	*/
+#define IH_ARCH_ARC		23	/* Synopsys DesignWare ARC */
 
 /*
  * Image Types
@@ -214,6 +224,7 @@ struct lmb;
 #define IH_TYPE_KERNEL_NOLOAD	14	/* OS Kernel Image, can run from any load address */
 #define IH_TYPE_PBLIMAGE	15	/* Freescale PBL Boot Image	*/
 #define IH_TYPE_MXSIMAGE	16	/* Freescale MXSBoot Image	*/
+#define IH_TYPE_GPIMAGE		17	/* TI Keystone GPHeader Image	*/
 
 /*
  * Compression Types
@@ -402,6 +413,7 @@ enum fit_load_op {
 #define IMAGE_FORMAT_INVALID	0x00
 #define IMAGE_FORMAT_LEGACY	0x01	/* legacy image_header based format */
 #define IMAGE_FORMAT_FIT	0x02	/* new, libfdt based format */
+#define IMAGE_FORMAT_ANDROID	0x03	/* Android boot image */
 
 int genimg_get_format(const void *img_addr);
 int genimg_has_config(bootm_headers_t *images);
@@ -822,7 +834,8 @@ int calculate_hash(const void *data, int data_len, const char *algo,
 #if defined(CONFIG_FIT_SIGNATURE)
 # ifdef USE_HOSTCC
 #  define IMAGE_ENABLE_SIGN	1
-#  define IMAGE_ENABLE_VERIFY	0
+#  define IMAGE_ENABLE_VERIFY	1
+# include  <openssl/evp.h>
 #else
 #  define IMAGE_ENABLE_SIGN	0
 #  define IMAGE_ENABLE_VERIFY	1
@@ -833,7 +846,9 @@ int calculate_hash(const void *data, int data_len, const char *algo,
 #endif
 
 #ifdef USE_HOSTCC
-# define gd_fdt_blob()		NULL
+void *image_get_host_blob(void);
+void image_set_host_blob(void *host_blob);
+# define gd_fdt_blob()		image_get_host_blob()
 #else
 # define gd_fdt_blob()		(gd->fdt_blob)
 #endif
@@ -860,6 +875,21 @@ struct image_sign_info {
 struct image_region {
 	const void *data;
 	int size;
+};
+
+#if IMAGE_ENABLE_VERIFY
+# include <rsa-checksum.h>
+#endif
+struct checksum_algo {
+	const char *name;
+	const int checksum_len;
+	const int pad_len;
+#if IMAGE_ENABLE_SIGN
+	const EVP_MD *(*calculate_sign)(void);
+#endif
+	void (*calculate)(const struct image_region region[],
+			  int region_count, uint8_t *checksum);
+	const uint8_t *rsa_padding;
 };
 
 struct image_sig_algo {
@@ -912,6 +942,9 @@ struct image_sig_algo {
 	int (*verify)(struct image_sign_info *info,
 		      const struct image_region region[], int region_count,
 		      uint8_t *sig, uint sig_len);
+
+	/* pointer to checksum algorithm */
+	struct checksum_algo *checksum;
 };
 
 /**
@@ -977,7 +1010,11 @@ struct image_region *fit_region_make_list(const void *fit,
 
 static inline int fit_image_check_target_arch(const void *fdt, int node)
 {
+#ifndef USE_HOSTCC
 	return fit_image_check_arch(fdt, node, IH_ARCH_DEFAULT);
+#else
+	return 0;
+#endif
 }
 
 #ifdef CONFIG_FIT_VERBOSE
@@ -994,5 +1031,17 @@ static inline int fit_image_check_target_arch(const void *fdt, int node)
 #define fit_unsupported_reset(msg)
 #endif /* CONFIG_FIT_VERBOSE */
 #endif /* CONFIG_FIT */
+
+#if defined(CONFIG_ANDROID_BOOT_IMAGE)
+struct andr_img_hdr;
+int android_image_check_header(const struct andr_img_hdr *hdr);
+int android_image_get_kernel(const struct andr_img_hdr *hdr, int verify,
+			     ulong *os_data, ulong *os_len);
+int android_image_get_ramdisk(const struct andr_img_hdr *hdr,
+			      ulong *rd_data, ulong *rd_len);
+ulong android_image_get_end(const struct andr_img_hdr *hdr);
+ulong android_image_get_kload(const struct andr_img_hdr *hdr);
+
+#endif /* CONFIG_ANDROID_BOOT_IMAGE */
 
 #endif	/* __IMAGE_H__ */
