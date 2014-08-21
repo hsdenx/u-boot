@@ -28,10 +28,8 @@ typedef volatile unsigned char	vu_char;
 #endif
 #if defined(CONFIG_8xx)
 #include <asm/8xx_immap.h>
-#if defined(CONFIG_MPC852)	|| defined(CONFIG_MPC852T)	|| \
-    defined(CONFIG_MPC859)	|| defined(CONFIG_MPC859T)	|| \
-    defined(CONFIG_MPC859DSL)	|| \
-    defined(CONFIG_MPC866)	|| defined(CONFIG_MPC866T)	|| \
+#if defined(CONFIG_MPC859)	|| defined(CONFIG_MPC859T)	|| \
+    defined(CONFIG_MPC866)	|| \
     defined(CONFIG_MPC866P)
 # define CONFIG_MPC866_FAMILY 1
 #elif defined(CONFIG_MPC870) \
@@ -320,14 +318,14 @@ int arch_early_init_r(void);
 void board_show_dram(ulong size);
 
 /**
- * arch_fixup_memory_node() - Write arch-specific memory information to fdt
+ * arch_fixup_fdt() - Write arch-specific information to fdt
  *
- * Defined in arch/$(ARCH)/lib/bootm.c
+ * Defined in arch/$(ARCH)/lib/bootm-fdt.c
  *
  * @blob:	FDT blob to write to
  * @return 0 if ok, or -ve FDT_ERR_... on failure
  */
-int arch_fixup_memory_node(void *blob);
+int arch_fixup_fdt(void *blob);
 
 /* common/flash.c */
 void flash_perror (int);
@@ -499,8 +497,6 @@ extern ssize_t spi_read	 (uchar *, int, uchar *, int);
 extern ssize_t spi_write (uchar *, int, uchar *, int);
 #endif
 
-void rpxlite_init (void);
-
 #ifdef CONFIG_HERMES
 /* $(BOARD)/hermes.c */
 void hermes_start_lxt980 (int speed);
@@ -643,6 +639,11 @@ void	serial_puts   (const char *);
 int	serial_getc   (void);
 int	serial_tstc   (void);
 
+/* These versions take a stdio_dev pointer */
+struct stdio_dev;
+int serial_stub_getc(struct stdio_dev *sdev);
+int serial_stub_tstc(struct stdio_dev *sdev);
+
 void	_serial_setbrg (const int);
 void	_serial_putc   (const char, const int);
 void	_serial_putc_raw(const char, const int);
@@ -687,9 +688,6 @@ ulong get_PERCLK3(void);
 ulong	get_bus_freq  (ulong);
 int get_serial_clock(void);
 
-#if defined(CONFIG_MPC83xx) || defined(CONFIG_MPC85xx)
-ulong get_ddr_freq(ulong);
-#endif
 #if defined(CONFIG_MPC85xx)
 typedef MPC85xx_SYS_INFO sys_info_t;
 void	get_sys_info  ( sys_info_t * );
@@ -705,6 +703,8 @@ static inline ulong get_ddr_freq(ulong dummy)
 {
 	return get_bus_freq(dummy);
 }
+#else
+ulong get_ddr_freq(ulong);
 #endif
 
 #if defined(CONFIG_4xx)

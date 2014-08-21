@@ -72,6 +72,11 @@ struct lmb;
 #  define IMAGE_ENABLE_SHA256	1
 # endif
 
+#ifdef CONFIG_FIT_DISABLE_SHA256
+#undef CONFIG_SHA256
+#undef IMAGE_ENABLE_SHA256
+#endif
+
 #ifndef IMAGE_ENABLE_CRC32
 #define IMAGE_ENABLE_CRC32	0
 #endif
@@ -419,6 +424,7 @@ enum fit_load_op {
 #define IMAGE_FORMAT_FIT	0x02	/* new, libfdt based format */
 #define IMAGE_FORMAT_ANDROID	0x03	/* Android boot image */
 
+ulong genimg_get_kernel_addr(char * const img_addr);
 int genimg_get_format(const void *img_addr);
 int genimg_has_config(bootm_headers_t *images);
 ulong genimg_get_image(ulong img_addr);

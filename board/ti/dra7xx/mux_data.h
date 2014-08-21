@@ -31,10 +31,15 @@ const struct pad_conf_entry core_padconf_array_essential[] = {
 	{GPMC_A26, (IEN | PTU | PDIS | M1)},	/* mmc2_dat2 */
 	{GPMC_A27, (IEN | PTU | PDIS | M1)},	/* mmc2_dat3 */
 	{GPMC_CS1, (IEN | PTU | PDIS | M1)},	/* mmm2_cmd */
+#if (CONFIG_CONS_INDEX == 1)
 	{UART1_RXD, (FSC | IEN | PTU | PDIS | M0)}, /* UART1_RXD */
 	{UART1_TXD, (FSC | IEN | PTU | PDIS | M0)}, /* UART1_TXD */
 	{UART1_CTSN, (IEN | PTU | PDIS | M3)},	/* UART1_CTSN */
 	{UART1_RTSN, (IEN | PTU | PDIS | M3)},	/* UART1_RTSN */
+#elif (CONFIG_CONS_INDEX == 3)
+	{UART3_RXD, (FSC | IEN | PTU | PDIS | M0)}, /* UART3_RXD */
+	{UART3_TXD, (FSC | IEN | PTU | PDIS | M0)}, /* UART3_TXD */
+#endif
 	{I2C1_SDA, (IEN | PTU | PDIS | M0)},	/* I2C1_SDA */
 	{I2C1_SCL, (IEN | PTU | PDIS | M0)},	/* I2C1_SCL */
 	{MDIO_MCLK, (PTU | PEN | M0)},		/* MDIO_MCLK  */
@@ -51,6 +56,18 @@ const struct pad_conf_entry core_padconf_array_essential[] = {
 	{RGMII0_RXD2, (IEN | M0) },
 	{RGMII0_RXD1, (IEN | M0) },
 	{RGMII0_RXD0, (IEN | M0) },
+	{VIN2A_D12, (M3) },
+	{VIN2A_D13, (M3) },
+	{VIN2A_D14, (M3) },
+	{VIN2A_D15, (M3) },
+	{VIN2A_D16, (M3) },
+	{VIN2A_D17, (M3) },
+	{VIN2A_D18, (IEN | M3)},
+	{VIN2A_D19, (IEN | M3)},
+	{VIN2A_D20, (IEN | M3)},
+	{VIN2A_D21, (IEN | M3)},
+	{VIN2A_D22, (IEN | M3)},
+	{VIN2A_D23, (IEN | M3)},
 	{GPMC_A13, (IEN | PDIS | M1)},  /* QSPI1_RTCLK */
 	{GPMC_A14, (IEN | PDIS | M1)},  /* QSPI1_D[3] */
 	{GPMC_A15, (IEN | PDIS | M1)},  /* QSPI1_D[2] */

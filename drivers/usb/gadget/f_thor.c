@@ -142,7 +142,8 @@ static long long int download_head(unsigned long long total,
 				   int *cnt)
 {
 	long long int rcv_cnt = 0, left_to_rcv, ret_rcv;
-	void *transfer_buffer = dfu_get_buf();
+	struct dfu_entity *dfu_entity = dfu_get_entity(alt_setting_num);
+	void *transfer_buffer = dfu_get_buf(dfu_entity);
 	void *buf = transfer_buffer;
 	int usb_pkt_cnt = 0, ret;
 
@@ -205,7 +206,7 @@ static long long int download_head(unsigned long long total,
 static int download_tail(long long int left, int cnt)
 {
 	struct dfu_entity *dfu_entity = dfu_get_entity(alt_setting_num);
-	void *transfer_buffer = dfu_get_buf();
+	void *transfer_buffer = dfu_get_buf(dfu_entity);
 	int ret;
 
 	debug("%s: left: %llu cnt: %d\n", __func__, left, cnt);
@@ -306,7 +307,6 @@ static int process_data(void)
 	ALLOC_CACHE_ALIGN_BUFFER(struct rqt_box, rqt, sizeof(struct rqt_box));
 	int ret = -EINVAL;
 
-	memset(rqt, 0, sizeof(rqt));
 	memcpy(rqt, thor_rx_data_buf, sizeof(struct rqt_box));
 
 	debug("+RQT: %d, %d\n", rqt->rqt, rqt->rqt_data);

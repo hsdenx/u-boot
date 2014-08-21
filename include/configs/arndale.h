@@ -121,7 +121,6 @@
 
 /* MMC SPL */
 #define CONFIG_EXYNOS_SPL
-#define CONFIG_SPL
 #define COPY_BL2_FNPTR_ADDR	0x02020030
 
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
@@ -228,6 +227,8 @@
 #define CONFIG_POWER_MAX77686
 
 #define CONFIG_DEFAULT_DEVICE_TREE	exynos5250-arndale
+
+#define CONFIG_PREBOOT
 
 /* Ethernet Controllor Driver */
 #ifdef CONFIG_CMD_NET

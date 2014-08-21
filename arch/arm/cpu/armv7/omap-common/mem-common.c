@@ -87,9 +87,13 @@ void gpmc_init(void)
 						STNOR_GPMC_CONFIG6,
 						STNOR_GPMC_CONFIG7
 						};
-	u32 size = GPMC_SIZE_16M;
 	u32 base = CONFIG_SYS_FLASH_BASE;
-#elif defined(CONFIG_NAND)
+	u32 size =	(CONFIG_SYS_FLASH_SIZE  > 0x08000000) ? GPMC_SIZE_256M :
+	/* > 64MB */	((CONFIG_SYS_FLASH_SIZE > 0x04000000) ? GPMC_SIZE_128M :
+	/* > 32MB */	((CONFIG_SYS_FLASH_SIZE > 0x02000000) ? GPMC_SIZE_64M  :
+	/* > 16MB */	((CONFIG_SYS_FLASH_SIZE > 0x01000000) ? GPMC_SIZE_32M  :
+	/* min 16MB */	GPMC_SIZE_16M)));
+#elif defined(CONFIG_NAND) || defined(CONFIG_CMD_NAND)
 /* configure GPMC for NAND */
 	const u32  gpmc_regs[GPMC_MAX_REG] = {	M_NAND_GPMC_CONFIG1,
 						M_NAND_GPMC_CONFIG2,
@@ -99,8 +103,9 @@ void gpmc_init(void)
 						M_NAND_GPMC_CONFIG6,
 						0
 						};
-	u32 size = GPMC_SIZE_256M;
 	u32 base = CONFIG_SYS_NAND_BASE;
+	u32 size = GPMC_SIZE_16M;
+
 #elif defined(CONFIG_CMD_ONENAND)
 	const u32 gpmc_regs[GPMC_MAX_REG] = {	ONENAND_GPMC_CONFIG1,
 						ONENAND_GPMC_CONFIG2,
@@ -110,8 +115,8 @@ void gpmc_init(void)
 						ONENAND_GPMC_CONFIG6,
 						0
 						};
-	u32 base = PISMO1_ONEN_BASE;
-	u32 size = PISMO1_ONEN_SIZE;
+	u32 size = GPMC_SIZE_128M;
+	u32 base = CONFIG_SYS_ONENAND_BASE;
 #else
 	const u32 gpmc_regs[GPMC_MAX_REG] = { 0, 0, 0, 0, 0, 0, 0 };
 	u32 size = 0;
@@ -121,7 +126,8 @@ void gpmc_init(void)
 	writel(0x00000008, &gpmc_cfg->sysconfig);
 	writel(0x00000000, &gpmc_cfg->irqstatus);
 	writel(0x00000000, &gpmc_cfg->irqenable);
-	writel(0x00000000, &gpmc_cfg->timeout_control);
+	/* disable timeout, set a safe reset value */
+	writel(0x00001ff0, &gpmc_cfg->timeout_control);
 #ifdef CONFIG_NOR
 	writel(0x00000200, &gpmc_cfg->config);
 #else
@@ -133,5 +139,6 @@ void gpmc_init(void)
 	writel(0, &gpmc_cfg->cs[0].config7);
 	sdelay(1000);
 	/* enable chip-select specific configurations */
-	enable_gpmc_cs_config(gpmc_regs, &gpmc_cfg->cs[0], base, size);
+	if (base != 0)
+		enable_gpmc_cs_config(gpmc_regs, &gpmc_cfg->cs[0], base, size);
 }

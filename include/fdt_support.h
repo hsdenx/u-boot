@@ -76,7 +76,7 @@ void ft_cpu_setup(void *blob, bd_t *bd);
 void ft_pci_setup(void *blob, bd_t *bd);
 
 void set_working_fdt_addr(void *addr);
-int fdt_resize(void *blob);
+int fdt_shrink_to_minimum(void *blob);
 int fdt_increase_size(void *fdt, int add_len);
 
 int fdt_fixup_nor_flash_size(void *blob);
@@ -113,16 +113,24 @@ static inline int fdt_status_disabled(void *fdt, int nodeoffset)
 {
 	return fdt_set_node_status(fdt, nodeoffset, FDT_STATUS_DISABLED, 0);
 }
+static inline int fdt_status_fail(void *fdt, int nodeoffset)
+{
+	return fdt_set_node_status(fdt, nodeoffset, FDT_STATUS_FAIL, 0);
+}
 
-int fdt_set_status_by_alias(void *fdt, const char* alias,
+int fdt_set_status_by_alias(void *fdt, const char *alias,
 			    enum fdt_status status, unsigned int error_code);
-static inline int fdt_status_okay_by_alias(void *fdt, const char* alias)
+static inline int fdt_status_okay_by_alias(void *fdt, const char *alias)
 {
 	return fdt_set_status_by_alias(fdt, alias, FDT_STATUS_OKAY, 0);
 }
-static inline int fdt_status_disabled_by_alias(void *fdt, const char* alias)
+static inline int fdt_status_disabled_by_alias(void *fdt, const char *alias)
 {
 	return fdt_set_status_by_alias(fdt, alias, FDT_STATUS_DISABLED, 0);
+}
+static inline int fdt_status_fail_by_alias(void *fdt, const char *alias)
+{
+	return fdt_set_status_by_alias(fdt, alias, FDT_STATUS_FAIL, 0);
 }
 
 #endif /* ifdef CONFIG_OF_LIBFDT */

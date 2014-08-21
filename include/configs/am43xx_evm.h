@@ -33,6 +33,8 @@
 #define CONFIG_SYS_I2C_MULTI_EEPROMS
 
 /* Power */
+#define CONFIG_POWER
+#define CONFIG_POWER_I2C
 #define CONFIG_POWER_TPS65218
 
 /* SPL defines. */
@@ -226,6 +228,8 @@
 			"setenv fdtfile am43x-epos-evm.dtb; fi; " \
 		"if test $board_name = AM43__GP; then " \
 			"setenv fdtfile am437x-gp-evm.dtb; fi; " \
+		"if test $board_name = AM43__SK; then " \
+			"setenv fdtfile am437x-sk-evm.dtb; fi; " \
 		"if test $fdtfile = undefined; then " \
 			"echo WARNING: Could not determine device tree; fi; \0"
 
