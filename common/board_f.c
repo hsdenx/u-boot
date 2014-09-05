@@ -34,6 +34,9 @@
 #ifdef CONFIG_MPC5xxx
 #include <mpc5xxx.h>
 #endif
+#if (defined(CONFIG_MPC86xx) || defined(CONFIG_E500))
+#include <asm/mp.h>
+#endif
 
 #include <os.h>
 #include <post.h>
@@ -43,9 +46,6 @@
 #include <watchdog.h>
 #include <asm/errno.h>
 #include <asm/io.h>
-#ifdef CONFIG_MP
-#include <asm/mp.h>
-#endif
 #include <asm/sections.h>
 #ifdef CONFIG_X86
 #include <asm/init_helpers.h>
@@ -270,7 +270,7 @@ static int setup_mon_len(void)
 	gd->mon_len = (ulong)&__bss_end - (ulong)_start;
 #elif defined(CONFIG_SANDBOX)
 	gd->mon_len = (ulong)&_end - (ulong)_init;
-#elif defined(CONFIG_BLACKFIN)
+#elif defined(CONFIG_BLACKFIN) || defined(CONFIG_NIOS2)
 	gd->mon_len = CONFIG_SYS_MONITOR_LEN;
 #else
 	/* TODO: use (ulong)&__bss_end - (ulong)&__text_start; ? */
@@ -392,7 +392,7 @@ static int setup_dest_addr(void)
 	gd->ram_top = board_get_usable_ram_top(gd->mon_len);
 	gd->relocaddr = gd->ram_top;
 	debug("Ram top: %08lX\n", (ulong)gd->ram_top);
-#if defined(CONFIG_MP) && (defined(CONFIG_MPC86xx) || defined(CONFIG_E500))
+#if (defined(CONFIG_MPC86xx) || defined(CONFIG_E500))
 	/*
 	 * We need to make sure the location we intend to put secondary core
 	 * boot code is reserved and not used by any part of u-boot
@@ -945,7 +945,7 @@ static init_fnc_t init_sequence_f[] = {
 	 *  - board info struct
 	 */
 	setup_dest_addr,
-#if defined(CONFIG_BLACKFIN)
+#if defined(CONFIG_BLACKFIN) || defined(CONFIG_NIOS2)
 	/* Blackfin u-boot monitor should be on top of the ram */
 	reserve_uboot,
 #endif
@@ -970,7 +970,7 @@ static init_fnc_t init_sequence_f[] = {
 		!defined(CONFIG_BLACKFIN)
 	reserve_video,
 #endif
-#if !defined(CONFIG_BLACKFIN)
+#if !defined(CONFIG_BLACKFIN) && !defined(CONFIG_NIOS2)
 	reserve_uboot,
 #endif
 #ifndef CONFIG_SPL_BUILD
