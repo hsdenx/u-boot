@@ -24,6 +24,8 @@
 #ifndef CONFIG_SPL_BUILD
 #define CONFIG_DM_SERIAL
 #endif
+#define CONFIG_DM_SPI
+#define CONFIG_DM_SPI_FLASH
 
 #define CONFIG_SYS_TIMER_RATE		1000000
 #define CONFIG_SYS_TIMER_COUNTER	NV_PA_TMRUS_BASE
@@ -116,6 +118,8 @@
 #define CONFIG_SYS_MEMTEST_START	(NV_PA_SDRC_CS0 + 0x600000)
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + 0x100000)
 
+#define CONFIG_USE_ARCH_MEMCPY
+
 /*-----------------------------------------------------------------------
  * Physical Memory Map
  */
@@ -151,10 +155,6 @@
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_GPIO_SUPPORT
-
-#ifdef CONFIG_SPL_BUILD
-# define CONFIG_USE_PRIVATE_LIBGCC
-#endif
 
 #define CONFIG_SYS_GENERIC_BOARD
 

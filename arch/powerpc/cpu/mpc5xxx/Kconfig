@@ -9,6 +9,7 @@ choice
 
 config TARGET_A3M071
 	bool "Support a3m071"
+	select SUPPORT_SPL
 
 config TARGET_A4M072
 	bool "Support a4m072"
@@ -97,12 +98,6 @@ config TARGET_MUCMC52
 config TARGET_UC101
 	bool "Support uc101"
 
-config TARGET_MVBC_P
-	bool "Support MVBC_P"
-
-config TARGET_MVSMR
-	bool "Support MVSMR"
-
 config TARGET_PCM030
 	bool "Support pcm030"
 
@@ -125,7 +120,6 @@ source "board/a4m072/Kconfig"
 source "board/bc3450/Kconfig"
 source "board/canmb/Kconfig"
 source "board/cm5200/Kconfig"
-source "board/emk/top5200/Kconfig"
 source "board/esd/cpci5200/Kconfig"
 source "board/esd/mecp5200/Kconfig"
 source "board/esd/pf5200/Kconfig"
@@ -139,8 +133,6 @@ source "board/jupiter/Kconfig"
 source "board/manroland/hmi1001/Kconfig"
 source "board/manroland/mucmc52/Kconfig"
 source "board/manroland/uc101/Kconfig"
-source "board/matrix_vision/mvbc_p/Kconfig"
-source "board/matrix_vision/mvsmr/Kconfig"
 source "board/mcc200/Kconfig"
 source "board/motionpro/Kconfig"
 source "board/munices/Kconfig"

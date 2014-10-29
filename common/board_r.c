@@ -60,7 +60,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 ulong monitor_flash_len;
 
-int __board_flash_wp_on(void)
+__weak int board_flash_wp_on(void)
 {
 	/*
 	 * Most flashes can't be detected when write protection is enabled,
@@ -70,15 +70,9 @@ int __board_flash_wp_on(void)
 	return 0;
 }
 
-int board_flash_wp_on(void)
-	__attribute__ ((weak, alias("__board_flash_wp_on")));
-
-void __cpu_secondary_init_r(void)
+__weak void cpu_secondary_init_r(void)
 {
 }
-
-void cpu_secondary_init_r(void)
-	__attribute__ ((weak, alias("__cpu_secondary_init_r")));
 
 static int initr_secondary_cpu(void)
 {
@@ -354,7 +348,7 @@ static int initr_flash(void)
 }
 #endif
 
-#ifdef CONFIG_PPC
+#if defined(CONFIG_PPC) && !defined(CONFIG_DM_SPI)
 static int initr_spi(void)
 {
 	/* PPC does this here */
@@ -370,7 +364,7 @@ static int initr_spi(void)
 
 #ifdef CONFIG_CMD_NAND
 /* go init the NAND */
-int initr_nand(void)
+static int initr_nand(void)
 {
 	puts("NAND:  ");
 	nand_init();
@@ -380,7 +374,7 @@ int initr_nand(void)
 
 #if defined(CONFIG_CMD_ONENAND)
 /* go init the NAND */
-int initr_onenand(void)
+static int initr_onenand(void)
 {
 	puts("NAND:  ");
 	onenand_init();
@@ -389,7 +383,7 @@ int initr_onenand(void)
 #endif
 
 #ifdef CONFIG_GENERIC_MMC
-int initr_mmc(void)
+static int initr_mmc(void)
 {
 	puts("MMC:   ");
 	mmc_initialize(gd->bd);
@@ -398,7 +392,7 @@ int initr_mmc(void)
 #endif
 
 #ifdef CONFIG_HAS_DATAFLASH
-int initr_dataflash(void)
+static int initr_dataflash(void)
 {
 	AT91F_DataflashInit();
 	dataflash_print_info();
@@ -664,7 +658,7 @@ int initr_mem(void)
 	/* Also take the logbuffer into account (pram is in kB) */
 	pram += (LOGBUFF_LEN + LOGBUFF_OVERHEAD) / 1024;
 # endif
-	sprintf(memsz, "%ldk", (gd->ram_size / 1024) - pram);
+	sprintf(memsz, "%ldk", (long int) ((gd->ram_size / 1024) - pram));
 	setenv("mem", memsz);
 
 	return 0;
@@ -717,6 +711,9 @@ init_fnc_t init_sequence_r[] = {
 	initr_caches,
 #endif
 	initr_reloc_global_data,
+#if defined(CONFIG_SYS_INIT_RAM_LOCK) && defined(CONFIG_E500)
+	initr_unlock_ram_in_cache,
+#endif
 	initr_barrier,
 	initr_malloc,
 	bootstage_relocate,
@@ -758,9 +755,6 @@ init_fnc_t init_sequence_r[] = {
 	INIT_FUNC_WATCHDOG_RESET
 #ifdef CONFIG_SYS_DELAYED_ICACHE
 	initr_icache_enable,
-#endif
-#if defined(CONFIG_SYS_INIT_RAM_LOCK) && defined(CONFIG_E500)
-	initr_unlock_ram_in_cache,
 #endif
 #if defined(CONFIG_PCI) && defined(CONFIG_SYS_EARLY_PCI_INIT)
 	/*

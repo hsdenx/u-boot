@@ -72,6 +72,7 @@ static const char * const compat_names[COMPAT_COUNT] = {
 	COMPAT(COMPAT_NXP_PTN3460, "nxp,ptn3460"),
 	COMPAT(SAMSUNG_EXYNOS_SYSMMU, "samsung,sysmmu-v3.3"),
 	COMPAT(PARADE_PS8625, "parade,ps8625"),
+	COMPAT(COMPAT_INTEL_LPC, "intel,lpc"),
 };
 
 const char *fdtdec_get_compatible(enum fdt_compat_id id)
@@ -705,6 +706,77 @@ int fdtdec_read_fmap_entry(const void *blob, int node, const char *name,
 	}
 	entry->offset = reg[0];
 	entry->length = reg[1];
+
+	return 0;
+}
+
+static u64 fdtdec_get_number(const fdt32_t *ptr, unsigned int cells)
+{
+	u64 number = 0;
+
+	while (cells--)
+		number = (number << 32) | fdt32_to_cpu(*ptr++);
+
+	return number;
+}
+
+int fdt_get_resource(const void *fdt, int node, const char *property,
+		     unsigned int index, struct fdt_resource *res)
+{
+	const fdt32_t *ptr, *end;
+	int na, ns, len, parent;
+	unsigned int i = 0;
+
+	parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return parent;
+
+	na = fdt_address_cells(fdt, parent);
+	ns = fdt_size_cells(fdt, parent);
+
+	ptr = fdt_getprop(fdt, node, property, &len);
+	if (!ptr)
+		return len;
+
+	end = ptr + len / sizeof(*ptr);
+
+	while (ptr + na + ns <= end) {
+		if (i == index) {
+			res->start = res->end = fdtdec_get_number(ptr, na);
+			res->end += fdtdec_get_number(&ptr[na], ns) - 1;
+			return 0;
+		}
+
+		ptr += na + ns;
+		i++;
+	}
+
+	return -FDT_ERR_NOTFOUND;
+}
+
+int fdt_get_named_resource(const void *fdt, int node, const char *property,
+			   const char *prop_names, const char *name,
+			   struct fdt_resource *res)
+{
+	int index;
+
+	index = fdt_find_string(fdt, node, prop_names, name);
+	if (index < 0)
+		return index;
+
+	return fdt_get_resource(fdt, node, property, index, res);
+}
+
+int fdtdec_pci_get_bdf(const void *fdt, int node, int *bdf)
+{
+	const fdt32_t *prop;
+	int len;
+
+	prop = fdt_getprop(fdt, node, "reg", &len);
+	if (!prop)
+		return len;
+
+	*bdf = fdt32_to_cpu(*prop) & 0xffffff;
 
 	return 0;
 }

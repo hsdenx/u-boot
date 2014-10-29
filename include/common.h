@@ -69,9 +69,6 @@ typedef volatile unsigned char	vu_char;
 #ifdef	CONFIG_4xx
 #include <asm/ppc4xx.h>
 #endif
-#ifdef CONFIG_HYMOD
-#include <board/hymod/hymod.h>
-#endif
 #ifdef CONFIG_ARM
 #define asmlinkage	/* nothing */
 #endif
@@ -85,6 +82,9 @@ typedef volatile unsigned char	vu_char;
 #include <part.h>
 #include <flash.h>
 #include <image.h>
+
+/* Bring in printf format macros if inttypes.h is included */
+#define __STDC_FORMAT_MACROS
 
 #ifdef __LP64__
 #define CONFIG_SYS_SUPPORT_64BIT_DATA
@@ -253,7 +253,19 @@ int	cpu_init(void);
 /* */
 phys_size_t initdram (int);
 int	display_options (void);
-void	print_size(unsigned long long, const char *);
+
+/**
+ * print_size() - Print a size with a suffic
+ *
+ * print sizes as "xxx KiB", "xxx.y KiB", "xxx MiB", "xxx.y MiB",
+ * xxx GiB, xxx.y GiB, etc as needed; allow for optional trailing string
+ * (like "\n")
+ *
+ * @size:	Size to print
+ * @suffix	String to print after the size
+ */
+void print_size(uint64_t size, const char *suffix);
+
 int print_buffer(ulong addr, const void *data, uint width, uint count,
 		 uint linelen);
 
@@ -636,13 +648,6 @@ struct stdio_dev;
 int serial_stub_getc(struct stdio_dev *sdev);
 int serial_stub_tstc(struct stdio_dev *sdev);
 
-void	_serial_setbrg (const int);
-void	_serial_putc   (const char, const int);
-void	_serial_putc_raw(const char, const int);
-void	_serial_puts   (const char *, const int);
-int	_serial_getc   (const int);
-int	_serial_tstc   (const int);
-
 /* $(CPU)/speed.c */
 int	get_clocks (void);
 int	get_clocks_866 (void);
@@ -773,7 +778,7 @@ void	invalidate_dcache_all(void);
 void	invalidate_icache_all(void);
 
 /* arch/$(ARCH)/lib/ticks.S */
-unsigned long long get_ticks(void);
+uint64_t get_ticks(void);
 void	wait_ticks    (unsigned long);
 
 /* arch/$(ARCH)/lib/time.c */

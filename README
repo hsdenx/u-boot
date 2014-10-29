@@ -544,6 +544,12 @@ The following options need to be configured:
 		CONFIG_SYS_FSL_OTHER_DDR_NUM_CTRLS
 		Number of controllers used for other than main memory.
 
+		CONFIG_SYS_FSL_SEC_BE
+		Defines the SEC controller register space as Big Endian
+
+		CONFIG_SYS_FSL_SEC_LE
+		Defines the SEC controller register space as Little Endian
+
 - Intel Monahans options:
 		CONFIG_SYS_MONAHANS_RUN_MODE_OSC_RATIO
 
@@ -616,13 +622,6 @@ The following options need to be configured:
 		workarounds to be applied; no CPU-type/version detection
 		exists, unlike the similar options in the Linux kernel. Do not
 		set these options unless they apply!
-
-- CPU timer options:
-		CONFIG_SYS_HZ
-
-		The frequency of the timer returned by get_timer().
-		get_timer() must operate in milliseconds and this CONFIG
-		option must be set to 1000.
 
 - Linux Kernel Interface:
 		CONFIG_CLOCKS_IN_MHZ
@@ -1458,6 +1457,9 @@ The following options need to be configured:
 
 		CONFIG_USB_EHCI_TXFIFO_THRESH enables setting of the
 		txfilltuning field in the EHCI controller on reset.
+
+		CONFIG_USB_DWC2_REG_ADDR the physical CPU address of the DWC2
+		HW module registers.
 
 - USB Device:
 		Define the below if you wish to use the USB console.
@@ -2716,6 +2718,14 @@ CBFS (Coreboot Filesystem) support
 		200 ms.
 
 - Configuration Management:
+		CONFIG_BUILD_TARGET
+
+		Some SoCs need special image types (e.g. U-Boot binary
+		with a special header) as build targets. By defining
+		CONFIG_BUILD_TARGET in the SoC / board header, this
+		special image will be automatically built upon calling
+		make / MAKEALL.
+
 		CONFIG_IDENT_STRING
 
 		If defined, this string will be added to the U-Boot
@@ -2823,10 +2833,6 @@ CBFS (Coreboot Filesystem) support
 		CONFIG_AUTO_COMPLETE
 
 		Enable auto completion of commands using TAB.
-
-		Note that this feature has NOT been implemented yet
-		for the "hush" shell.
-
 
 		CONFIG_SYS_HUSH_PARSER
 
@@ -3541,7 +3547,7 @@ FIT uImage format:
 
 		CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR,
 		CONFIG_SYS_U_BOOT_MAX_SIZE_SECTORS,
-		CONFIG_SYS_MMC_SD_FAT_BOOT_PARTITION
+		CONFIG_SYS_MMC_SD_FS_BOOT_PARTITION
 		Address, size and partition on the MMC to load U-Boot from
 		when the MMC is being used in raw mode.
 
@@ -3558,16 +3564,19 @@ FIT uImage format:
 		CONFIG_SPL_FAT_SUPPORT
 		Support for fs/fat/libfat.o in SPL binary
 
-		CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME
-		Filename to read to load U-Boot when reading from FAT
+		CONFIG_SPL_EXT_SUPPORT
+		Support for EXT filesystem in SPL binary
 
-		CONFIG_SPL_FAT_LOAD_KERNEL_NAME
+		CONFIG_SPL_FS_LOAD_PAYLOAD_NAME
+		Filename to read to load U-Boot when reading from filesystem
+
+		CONFIG_SPL_FS_LOAD_KERNEL_NAME
 		Filename to read to load kernel uImage when reading
-		from FAT (for Falcon mode)
+		from filesystem (for Falcon mode)
 
-		CONFIG_SPL_FAT_LOAD_ARGS_NAME
+		CONFIG_SPL_FS_LOAD_ARGS_NAME
 		Filename to read to load kernel argument parameters
-		when reading from FAT (for Falcon mode)
+		when reading from filesystem (for Falcon mode)
 
 		CONFIG_SPL_MPC83XX_WAIT_FOR_NAND
 		Set this for NAND SPL on PPC mpc83xx targets, so that
@@ -4047,6 +4056,11 @@ Configuration Settings:
 	This is set by OMAP boards for the max time that reset should
 	be asserted. See doc/README.omap-reset-time for details on how
 	the value can be calulated on a given board.
+
+- CONFIG_USE_STDINT
+	If stdint.h is available with your toolchain you can define this
+	option to enable it. You can provide option 'USE_STDINT=1' when
+	building U-Boot to enable this.
 
 The following definitions that deal with the placement and management
 of environment data (variable area); in general, we support the

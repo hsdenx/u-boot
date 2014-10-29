@@ -223,6 +223,7 @@
 /* Bootcount using the RTC block */
 #define CONFIG_BOOTCOUNT_LIMIT
 #define CONFIG_BOOTCOUNT_AM33XX
+#define CONFIG_SYS_BOOTCOUNT_BE
 
 /* USB gadget RNDIS */
 #define CONFIG_SPL_MUSB_NEW_SUPPORT
@@ -351,10 +352,10 @@
 	"boot part 0 1;" \
 	"rootfs part 0 2;" \
 	"MLO fat 0 1;" \
-	"MLO.raw mmc 0x100 0x100;" \
-	"u-boot.img.raw mmc 0x300 0x400;" \
-	"spl-os-args.raw mmc 0x80 0x80;" \
-	"spl-os-image.raw mmc 0x900 0x2000;" \
+	"MLO.raw raw 0x100 0x100;" \
+	"u-boot.img.raw raw 0x300 0x400;" \
+	"spl-os-args.raw raw 0x80 0x80;" \
+	"spl-os-image.raw raw 0x900 0x2000;" \
 	"spl-os-args fat 0 1;" \
 	"spl-os-image fat 0 1;" \
 	"u-boot.img fat 0 1;" \
@@ -381,7 +382,7 @@
 	"fdt ram 0x80F80000 0x80000;" \
 	"ramdisk ram 0x81000000 0x4000000\0"
 #define DFUARGS \
-	"dfu_alt_info_emmc=rawemmc mmc 0 3751936\0" \
+	"dfu_alt_info_emmc=rawemmc raw 0 3751936\0" \
 	DFU_ALT_INFO_MMC \
 	DFU_ALT_INFO_RAM \
 	DFU_ALT_INFO_NAND

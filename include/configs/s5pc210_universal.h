@@ -10,7 +10,7 @@
 #ifndef __CONFIG_UNIVERSAL_H
 #define __CONFIG_UNIVERSAL_H
 
-#include <configs/exynos4-dt.h>
+#include <configs/exynos4-common.h>
 
 #define CONFIG_SYS_PROMPT	"Universal # "	/* Monitor Command Prompt */
 
@@ -26,9 +26,6 @@
 #define PHYS_SDRAM_1			CONFIG_SYS_SDRAM_BASE
 
 #define SDRAM_BANK_SIZE			(256 << 20)	/* 256 MB */
-
-/* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (80 * SZ_1M))
 
 /* select serial console configuration */
 #define CONFIG_SERIAL2
@@ -190,17 +187,7 @@
  * SPI Settings
  */
 #define CONFIG_SOFT_SPI
-#define CONFIG_SOFT_SPI_MODE SPI_MODE_3
-#define CONFIG_SOFT_SPI_GPIO_SCLK EXYNOS4_GPIO_Y31
-#define CONFIG_SOFT_SPI_GPIO_MOSI EXYNOS4_GPIO_Y33
-#define CONFIG_SOFT_SPI_GPIO_MISO EXYNOS4_GPIO_Y30
-#define CONFIG_SOFT_SPI_GPIO_CS EXYNOS4_GPIO_Y43
 
-#define SPI_DELAY udelay(1)
-#undef SPI_INIT
-#define SPI_SCL(bit) universal_spi_scl(bit)
-#define SPI_SDA(bit) universal_spi_sda(bit)
-#define SPI_READ universal_spi_read()
 #ifndef	__ASSEMBLY__
 void universal_spi_scl(int bit);
 void universal_spi_sda(int bit);

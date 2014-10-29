@@ -69,6 +69,7 @@ unsigned long get_board_ddr_clk(void);
 
 #define CONFIG_SYS_HAS_SERDES
 
+#define CONFIG_FSL_CAAM			/* Enable CAAM */
 /*
  * IFC Definitions
  */
@@ -359,7 +360,6 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_SYS_MEMTEST_END		0x9fffffff
 
 #define CONFIG_SYS_LOAD_ADDR		0x82000000
-#define CONFIG_SYS_HZ			1000
 
 /*
  * Stack sizes
@@ -387,5 +387,15 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_OF_LIBFDT
 #define CONFIG_OF_BOARD_SETUP
 #define CONFIG_CMD_BOOTZ
+
+#define CONFIG_MISC_INIT_R
+
+/* Hash command with SHA acceleration supported in hardware */
+#define CONFIG_CMD_HASH
+#define CONFIG_SHA_HW_ACCEL
+
+#ifdef CONFIG_SECURE_BOOT
+#define CONFIG_CMD_BLOB
+#endif
 
 #endif

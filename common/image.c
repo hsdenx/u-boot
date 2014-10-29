@@ -138,10 +138,12 @@ static const table_entry_t uimage_type[] = {
 	{	IH_TYPE_PBLIMAGE,   "pblimage",   "Freescale PBL Boot Image",},
 	{	IH_TYPE_RAMDISK,    "ramdisk",	  "RAMDisk Image",	},
 	{	IH_TYPE_SCRIPT,     "script",	  "Script",		},
+	{	IH_TYPE_SOCFPGAIMAGE, "socfpgaimage", "Altera SOCFPGA preloader",},
 	{	IH_TYPE_STANDALONE, "standalone", "Standalone Program", },
 	{	IH_TYPE_UBLIMAGE,   "ublimage",   "Davinci UBL image",},
 	{	IH_TYPE_MXSIMAGE,   "mxsimage",   "Freescale MXS Boot Image",},
 	{	IH_TYPE_ATMELIMAGE, "atmelimage", "ATMEL ROM-Boot Image",},
+	{	IH_TYPE_X86_SETUP,  "x86_setup",  "x86 setup.bin",    },
 	{	-1,		    "",		  "",			},
 };
 
@@ -1008,7 +1010,8 @@ int boot_get_ramdisk(int argc, char * const argv[], bootm_headers_t *images,
 		image_multi_getimg(images->legacy_hdr_os, 1, &rd_data, &rd_len);
 	}
 #ifdef CONFIG_ANDROID_BOOT_IMAGE
-	else if ((genimg_get_format(images) == IMAGE_FORMAT_ANDROID) &&
+	else if ((genimg_get_format((void *)images->os.start)
+			== IMAGE_FORMAT_ANDROID) &&
 		 (!android_image_get_ramdisk((void *)images->os.start,
 		 &rd_data, &rd_len))) {
 		/* empty */
@@ -1134,6 +1137,16 @@ error:
 	return -1;
 }
 #endif /* CONFIG_SYS_BOOT_RAMDISK_HIGH */
+
+int boot_get_setup(bootm_headers_t *images, uint8_t arch,
+		   ulong *setup_start, ulong *setup_len)
+{
+#if defined(CONFIG_FIT)
+	return boot_get_setup_fit(images, arch, setup_start, setup_len);
+#else
+	return -ENOENT;
+#endif
+}
 
 #ifdef CONFIG_SYS_BOOT_GET_CMDLINE
 /**

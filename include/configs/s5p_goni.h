@@ -39,8 +39,9 @@
 #define CONFIG_INITRD_TAG
 #define CONFIG_CMDLINE_EDITING
 
-/* Size of malloc() pool.*/
-#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + 80 * SZ_1M)
+/* Size of malloc() pool before and after relocation */
+#define CONFIG_SYS_MALLOC_F_LEN		(1 << 10)
+#define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (80 << 20))
 
 /*
  * select serial console configuration
@@ -53,6 +54,7 @@
 #define CONFIG_MMC
 #define CONFIG_SDHCI
 #define CONFIG_S5P_SDHCI
+#define SDHCI_MAX_HOSTS		4
 
 /* PWM */
 #define CONFIG_PWM			1
@@ -106,7 +108,6 @@
 				",12m(modem)"\
 				",60m(qboot)\0"
 
-#define CONFIG_BOOTDELAY		1
 #define CONFIG_ZERO_BOOTDELAY_CHECK
 
 /* partitions definitions */
@@ -275,6 +276,8 @@
 #define CONFIG_SYS_I2C_SOFT_SPEED	50000
 #define CONFIG_SYS_I2C_SOFT_SLAVE	0x7F
 #define CONFIG_I2C_MULTI_BUS
+#define CONFIG_SYS_I2C_INIT_BOARD
+
 #define CONFIG_SYS_MAX_I2C_BUS	7
 #define CONFIG_USB_GADGET
 #define CONFIG_USB_GADGET_S3C_UDC_OTG
@@ -282,5 +285,13 @@
 #define CONFIG_USB_GADGET_VBUS_DRAW 2
 #define CONFIG_CMD_USB_MASS_STORAGE
 #define CONFIG_USB_GADGET_MASS_STORAGE
+
+#define CONFIG_OF_LIBFDT
+
+#define CONFIG_SYS_GENERIC_BOARD
+#define CONFIG_DM
+#define CONFIG_CMD_DM
+#define CONFIG_DM_GPIO
+#define CONFIG_DM_SERIAL
 
 #endif	/* __CONFIG_H */

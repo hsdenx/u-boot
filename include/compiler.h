@@ -48,6 +48,10 @@
 # include <machine/endian.h>
 typedef unsigned long ulong;
 #endif
+#ifdef __FreeBSD__
+# include <sys/endian.h> /* htole32 and friends */
+#endif
+
 #include <time.h>
 
 typedef uint8_t __u8;
@@ -108,6 +112,14 @@ typedef unsigned int uint;
 
 #else /* !USE_HOSTCC */
 
+#ifdef CONFIG_USE_STDINT
+/* Provided by gcc. */
+#include <stdint.h>
+#else
+/* Type for `void *' pointers. */
+typedef unsigned long int uintptr_t;
+#endif
+
 #include <linux/string.h>
 #include <linux/types.h>
 #include <asm/byteorder.h>
@@ -123,9 +135,6 @@ typedef unsigned int uint;
  */
 #define __WORDSIZE	32
 #endif
-
-/* Type for `void *' pointers. */
-typedef unsigned long int uintptr_t;
 
 #endif /* USE_HOSTCC */
 
