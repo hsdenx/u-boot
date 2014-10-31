@@ -118,6 +118,7 @@ alias fdt            uboot, sjg
 alias i2c            uboot, hs
 alias kconfig        uboot, masahiro
 alias mmc            uboot, panto
+alias mtd            uboot, hs
 alias nand           uboot, scottwood
 alias net            uboot, jhersh
 alias spi            uboot, jagan
