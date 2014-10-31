@@ -269,6 +269,14 @@ S:	Maintained
 T:	git git://git.denx.de/u-boot-mmc.git
 F:	drivers/mmc/
 
+MTD
+M:	Heiko Schocher <hs@denx.de>
+S:	Maintained
+T:	git git://git.denx.de/u-boot-mtd.git
+F:	drivers/mtd/
+F:	include/linux/mtd/
+F:	include/mtd/
+
 OPENRISC
 M:	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
 S:	Maintained
