@@ -12,6 +12,7 @@
  */
 
 #include "imagetool.h"
+#include <limits.h>
 #include <image.h>
 #include <stdint.h>
 #include "kwbimage.h"
@@ -324,7 +325,7 @@ static void *image_create_v0(size_t *imagesz, struct image_tool_params *params,
 	main_hdr = image;
 
 	/* Fill in the main header */
-	main_hdr->blocksize = payloadsz + sizeof(uint32_t);
+	main_hdr->blocksize = payloadsz + sizeof(uint32_t) - headersz;
 	main_hdr->srcaddr   = headersz;
 	main_hdr->ext       = has_ext;
 	main_hdr->destaddr  = params->addr;
@@ -396,13 +397,20 @@ static size_t image_headersz_v1(struct image_tool_params *params,
 
 		ret = stat(binarye->binary.file, &s);
 		if (ret < 0) {
-			char *cwd = get_current_dir_name();
+			char cwd[PATH_MAX];
+			char *dir = cwd;
+
+			memset(cwd, 0, sizeof(cwd));
+			if (!getcwd(cwd, sizeof(cwd))) {
+				dir = "current working directory";
+				perror("getcwd() failed");
+			}
+
 			fprintf(stderr,
 				"Didn't find the file '%s' in '%s' which is mandatory to generate the image\n"
 				"This file generally contains the DDR3 training code, and should be extracted from an existing bootable\n"
 				"image for your board. See 'kwbimage -x' to extract it from an existing image.\n",
-				binarye->binary.file, cwd);
-			free(cwd);
+				binarye->binary.file, dir);
 			return 0;
 		}
 
@@ -752,14 +760,25 @@ static void kwbimage_set_header(void *ptr, struct stat *sbuf, int ifd,
 	}
 
 	version = image_get_version();
-	/* Fallback to version 0 is no version is provided in the cfg file */
-	if (version == -1)
-		version = 0;
-
-	if (version == 0)
+	switch (version) {
+		/*
+		 * Fallback to version 0 if no version is provided in the
+		 * cfg file
+		 */
+	case -1:
+	case 0:
 		image = image_create_v0(&headersz, params, sbuf->st_size);
-	else if (version == 1)
+		break;
+
+	case 1:
 		image = image_create_v1(&headersz, params, sbuf->st_size);
+		break;
+
+	default:
+		fprintf(stderr, "Unsupported version %d\n", version);
+		free(image_cfg);
+		exit(EXIT_FAILURE);
+	}
 
 	if (!image) {
 		fprintf(stderr, "Could not create image\n");
@@ -792,8 +811,8 @@ static void kwbimage_print_header(const void *ptr)
 
 	printf("Image Type:   MVEBU Boot from %s Image\n",
 	       image_boot_mode_name(mhdr->blockid));
-	printf("Data Size:    ");
 	printf("Image version:%d\n", image_version((void *)ptr));
+	printf("Data Size:    ");
 	genimg_print_size(mhdr->blocksize - sizeof(uint32_t));
 	printf("Load Address: %08x\n", mhdr->destaddr);
 	printf("Entry Point:  %08x\n", mhdr->execaddr);
@@ -816,7 +835,8 @@ static int kwbimage_verify_header(unsigned char *ptr, int image_size,
 
 	main_hdr = (void *)ptr;
 	checksum = image_checksum8(ptr,
-				   sizeof(struct main_hdr_v0));
+				   sizeof(struct main_hdr_v0)
+				   - sizeof(uint8_t));
 	if (checksum != main_hdr->checksum)
 		return -FDT_ERR_BADSTRUCTURE;
 
@@ -824,7 +844,8 @@ static int kwbimage_verify_header(unsigned char *ptr, int image_size,
 	if (image_version((void *)ptr) == 0) {
 		ext_hdr = (void *)ptr + sizeof(struct main_hdr_v0);
 		checksum = image_checksum8(ext_hdr,
-					   sizeof(struct ext_hdr_v0));
+					   sizeof(struct ext_hdr_v0)
+					   - sizeof(uint8_t));
 		if (checksum != ext_hdr->checksum)
 			return -FDT_ERR_BADSTRUCTURE;
 	}
