@@ -220,6 +220,11 @@ config TARGET_TAURUS
 	bool "Support taurus"
 	select CPU_ARM926EJS
 
+config TARGET_SMARTWEB_HW
+	select SUPPORT_SPL
+	bool "Support smartweb_hw"
+	select CPU_ARM926EJS
+
 config TARGET_STAMP9G20
 	bool "Support stamp9g20"
 	select CPU_ARM926EJS
@@ -970,6 +975,7 @@ source "board/siemens/corvus/Kconfig"
 source "board/siemens/draco/Kconfig"
 source "board/siemens/pxm2/Kconfig"
 source "board/siemens/rut/Kconfig"
+source "board/siemens/smartweb_hw/Kconfig"
 source "board/siemens/taurus/Kconfig"
 source "board/silica/pengwyn/Kconfig"
 source "board/solidrun/hummingboard/Kconfig"
