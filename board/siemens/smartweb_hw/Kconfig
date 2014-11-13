@@ -1,0 +1,12 @@
+if TARGET_SMARTWEB_HW
+
+config SYS_BOARD
+	default "smartweb_hw"
+
+config SYS_VENDOR
+	default "siemens"
+
+config SYS_CONFIG_NAME
+	default "smartweb_hw"
+
+endif
