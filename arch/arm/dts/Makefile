@@ -1,3 +1,4 @@
+dtb-$(CONFIG_MACH_SUN7I) +=  sun7i-a20-pcduino3.dtb
 dtb-$(CONFIG_S5PC100) += s5pc1xx-smdkc100.dtb
 dtb-$(CONFIG_S5PC110) += s5pc1xx-goni.dtb
 dtb-$(CONFIG_EXYNOS4) += exynos4210-origen.dtb \
@@ -33,11 +34,14 @@ dtb-$(CONFIG_TEGRA) += tegra20-harmony.dtb \
 dtb-$(CONFIG_ZYNQ) += zynq-zc702.dtb \
 	zynq-zc706.dtb \
 	zynq-zed.dtb \
+	zynq-zybo.dtb \
 	zynq-microzed.dtb \
 	zynq-zc770-xm010.dtb \
 	zynq-zc770-xm012.dtb \
 	zynq-zc770-xm013.dtb
 dtb-$(CONFIG_AM33XX) += am335x-boneblack.dtb
+
+dtb-$(CONFIG_SOCFPGA) += socfpga_cyclone5_socrates.dtb
 
 targets += $(dtb-y)
 

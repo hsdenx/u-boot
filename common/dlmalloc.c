@@ -1533,6 +1533,9 @@ void mem_malloc_init(ulong start, ulong size)
 	mem_malloc_end = start + size;
 	mem_malloc_brk = start;
 
+	debug("using memory %#lx-%#lx for malloc()\n", mem_malloc_start,
+	      mem_malloc_end);
+
 	memset((void *)mem_malloc_start, 0, size);
 
 	malloc_bin_reloc();
@@ -2181,7 +2184,7 @@ Void_t* mALLOc(bytes) size_t bytes;
   INTERNAL_SIZE_T nb;
 
 #ifdef CONFIG_SYS_MALLOC_F_LEN
-	if (!(gd->flags & GD_FLG_RELOC)) {
+	if (gd && !(gd->flags & GD_FLG_RELOC)) {
 		ulong new_ptr;
 		void *ptr;
 

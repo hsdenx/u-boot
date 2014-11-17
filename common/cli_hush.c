@@ -3162,7 +3162,7 @@ static int parse_stream_outer(struct in_str *inp, int flag)
 	o_string temp=NULL_O_STRING;
 	int rcode;
 #ifdef __U_BOOT__
-	int code = 0;
+	int code = 1;
 #endif
 	do {
 		ctx.type = flag;
@@ -3217,7 +3217,7 @@ static int parse_stream_outer(struct in_str *inp, int flag)
 		}
 		b_free(&temp);
 	/* loop on syntax errors, return on EOF */
-	} while (rcode != -1 && !(flag & FLAG_EXIT_FROM_LOOP) &&
+	} while (rcode != 1 && !(flag & FLAG_EXIT_FROM_LOOP) &&
 		(inp->peek != static_peek || b_peek(inp)));
 #ifndef __U_BOOT__
 	return 0;
@@ -3236,8 +3236,10 @@ int parse_string_outer(const char *s, int flag)
 #ifdef __U_BOOT__
 	char *p = NULL;
 	int rcode;
-	if ( !s || !*s)
+	if (!s)
 		return 1;
+	if (!*s)
+		return 0;
 	if (!(p = strchr(s, '\n')) || *++p) {
 		p = xmalloc(strlen(s) + 2);
 		strcpy(p, s);

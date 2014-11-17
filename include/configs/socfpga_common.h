@@ -37,7 +37,7 @@
  */
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0x0
-#define CONFIG_SYS_MALLOC_LEN		(10 * 1024 * 1024)
+#define CONFIG_SYS_MALLOC_LEN		(64 * 1024 * 1024)
 #define CONFIG_SYS_MEMTEST_START	PHYS_SDRAM_1
 #define CONFIG_SYS_MEMTEST_END		PHYS_SDRAM_1_SIZE
 
@@ -77,6 +77,25 @@
 #define CONFIG_SYS_CACHELINE_SIZE 32
 #define CONFIG_SYS_L2_PL310
 #define CONFIG_SYS_PL310_BASE		SOCFPGA_MPUL2_ADDRESS
+
+/*
+ * EPCS/EPCQx1 Serial Flash Controller
+ */
+#ifdef CONFIG_ALTERA_SPI
+#define CONFIG_CMD_SPI
+#define CONFIG_CMD_SF
+#define CONFIG_SF_DEFAULT_SPEED		30000000
+#define CONFIG_SPI_FLASH
+#define CONFIG_SPI_FLASH_STMICRO
+#define CONFIG_SPI_FLASH_BAR
+/*
+ * The base address is configurable in QSys, each board must specify the
+ * base address based on it's particular FPGA configuration. Please note
+ * that the address here is incremented by  0x400  from the Base address
+ * selected in QSys, since the SPI registers are at offset +0x400.
+ * #define CONFIG_SYS_SPI_BASE		0xff240400
+ */
+#endif
 
 /*
  * Ethernet on SoC (EMAC)
@@ -141,6 +160,33 @@
 #define CONFIG_SYS_MMC_MAX_BLK_COUNT	256	/* FIXME -- SPL only? */
 #endif
 
+ /*
+ * I2C support
+ */
+#define CONFIG_SYS_I2C
+#define CONFIG_SYS_I2C_DW
+#define CONFIG_SYS_I2C_BUS_MAX		4
+#define CONFIG_SYS_I2C_BASE		SOCFPGA_I2C0_ADDRESS
+#define CONFIG_SYS_I2C_BASE1		SOCFPGA_I2C1_ADDRESS
+#define CONFIG_SYS_I2C_BASE2		SOCFPGA_I2C2_ADDRESS
+#define CONFIG_SYS_I2C_BASE3		SOCFPGA_I2C3_ADDRESS
+/* Using standard mode which the speed up to 100Kb/s */
+#define CONFIG_SYS_I2C_SPEED		100000
+#define CONFIG_SYS_I2C_SPEED1		100000
+#define CONFIG_SYS_I2C_SPEED2		100000
+#define CONFIG_SYS_I2C_SPEED3		100000
+/* Address of device when used as slave */
+#define CONFIG_SYS_I2C_SLAVE		0x02
+#define CONFIG_SYS_I2C_SLAVE1		0x02
+#define CONFIG_SYS_I2C_SLAVE2		0x02
+#define CONFIG_SYS_I2C_SLAVE3		0x02
+#ifndef __ASSEMBLY__
+/* Clock supplied to I2C controller in unit of MHz */
+unsigned int cm_get_l4_sp_clk_hz(void);
+#define IC_CLK				(cm_get_l4_sp_clk_hz() / 1000000)
+#endif
+#define CONFIG_CMD_I2C
+
 /*
  * Serial Driver
  */
@@ -169,6 +215,34 @@
  * #define CONFIG_USB_DWC2_REG_ADDR	SOCFPGA_USB0_ADDRESS
  * #define CONFIG_USB_DWC2_REG_ADDR	SOCFPGA_USB1_ADDRESS
  */
+#endif
+
+/*
+ * USB Gadget (DFU, UMS)
+ */
+#if defined(CONFIG_CMD_DFU) || defined(CONFIG_CMD_USB_MASS_STORAGE)
+#define CONFIG_USB_GADGET
+#define CONFIG_USB_GADGET_S3C_UDC_OTG
+#define CONFIG_USB_GADGET_DUALSPEED
+#define CONFIG_USB_GADGET_VBUS_DRAW	2
+
+/* USB Composite download gadget - g_dnl */
+#define CONFIG_USBDOWNLOAD_GADGET
+#define CONFIG_USB_GADGET_MASS_STORAGE
+
+#define CONFIG_DFU_FUNCTION
+#define CONFIG_DFU_MMC
+#define CONFIG_SYS_DFU_DATA_BUF_SIZE	(32 * 1024 * 1024)
+#define DFU_DEFAULT_POLL_TIMEOUT	300
+
+/* USB IDs */
+#define CONFIG_G_DNL_VENDOR_NUM		0x0525	/* NetChip */
+#define CONFIG_G_DNL_PRODUCT_NUM	0xA4A5	/* Linux-USB File-backed Storage Gadget */
+#define CONFIG_G_DNL_UMS_VENDOR_NUM	CONFIG_G_DNL_VENDOR_NUM
+#define CONFIG_G_DNL_UMS_PRODUCT_NUM	CONFIG_G_DNL_PRODUCT_NUM
+#ifndef CONFIG_G_DNL_MANUFACTURER
+#define CONFIG_G_DNL_MANUFACTURER	"Altera"
+#endif
 #endif
 
 /*

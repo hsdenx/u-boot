@@ -49,6 +49,7 @@ config SYS_CPU
         default "armv7" if CPU_V7
         default "pxa" if CPU_PXA
         default "sa1100" if CPU_SA1100
+	default "armv8" if ARM64
 
 choice
 	prompt "Target select"
@@ -225,9 +226,11 @@ config KIRKWOOD
 
 config TARGET_DB_MV784MP_GP
 	bool "Support db-mv784mp-gp"
+	select CPU_V7
 
 config TARGET_MAXBCM
 	bool "Support maxbcm"
+	select CPU_V7
 
 config TARGET_DEVKIT3250
 	bool "Support devkit3250"
@@ -609,6 +612,7 @@ config TARGET_MX6QSABREAUTO
 config TARGET_MX6SABRESD
 	bool "Support mx6sabresd"
 	select CPU_V7
+	select SUPPORT_SPL
 
 config TARGET_MX6SLEVK
 	bool "Support mx6slevk"
@@ -626,6 +630,14 @@ config TARGET_GW_VENTANA
 config TARGET_HUMMINGBOARD
 	bool "Support hummingboard"
 	select CPU_V7
+
+config TARGET_KOSAGI_NOVENA
+	bool "Support Kosagi Novena"
+	select CPU_V7
+	select SUPPORT_SPL
+
+config TARGET_TBS2910
+	bool "Support tbs2910"
 
 config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
@@ -663,30 +675,8 @@ config TARGET_SOCFPGA_CYCLONE5
 	select CPU_V7
 	select SUPPORT_SPL
 
-config TARGET_SUN4I
-	bool "Support sun4i"
-	select CPU_V7
-	select SUPPORT_SPL
-
-config TARGET_SUN5I
-	bool "Support sun5i"
-	select CPU_V7
-	select SUPPORT_SPL
-
-config TARGET_SUN6I
-	bool "Support sun6i"
-	select CPU_V7
-	select SUPPORT_SPL
-
-config TARGET_SUN7I
-	bool "Support sun7i"
-	select CPU_V7
-	select SUPPORT_SPL
-
-config TARGET_SUN8I
-	bool "Support sun8i"
-	select CPU_V7
-	select SUPPORT_SPL
+config ARCH_SUNXI
+	bool "Support sunxi (Allwinner) SoCs"
 
 config TARGET_SNOWBALL
 	bool "Support snowball"
@@ -793,8 +783,6 @@ config ARCH_UNIPHIER
 	select SUPPORT_SPL
 
 endchoice
-
-source "arch/arm/cpu/armv8/Kconfig"
 
 source "arch/arm/cpu/arm926ejs/davinci/Kconfig"
 
@@ -914,6 +902,7 @@ source "board/imx31_phycore/Kconfig"
 source "board/isee/igep0033/Kconfig"
 source "board/jornada/Kconfig"
 source "board/karo/tx25/Kconfig"
+source "board/kosagi/novena/Kconfig"
 source "board/logicpd/imx27lite/Kconfig"
 source "board/logicpd/imx31_litekit/Kconfig"
 source "board/maxbcm/Kconfig"
@@ -951,6 +940,7 @@ source "board/sunxi/Kconfig"
 source "board/syteco/jadecpu/Kconfig"
 source "board/syteco/zmx25/Kconfig"
 source "board/taskit/stamp9g20/Kconfig"
+source "board/tbs/tbs2910/Kconfig"
 source "board/ti/am335x/Kconfig"
 source "board/ti/am43xx/Kconfig"
 source "board/ti/ti814x/Kconfig"
@@ -967,5 +957,7 @@ source "board/wandboard/Kconfig"
 source "board/woodburn/Kconfig"
 source "board/xaeniax/Kconfig"
 source "board/zipitz2/Kconfig"
+
+source "arch/arm/Kconfig.debug"
 
 endmenu
