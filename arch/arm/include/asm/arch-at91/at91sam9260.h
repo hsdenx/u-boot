@@ -21,7 +21,6 @@
 /*
  * defines to be used in other places
  */
-#define CONFIG_ARM926EJS	/* ARM926EJS Core */
 #define CONFIG_AT91FAMILY	/* it's a member of AT91 */
 
 /*
@@ -137,9 +136,11 @@
 /*
  * Other misc defines
  */
+#ifndef CONFIG_DM_GPIO
 #define ATMEL_PIO_PORTS		3		/* these SoCs have 3 PIO */
-#define ATMEL_PMC_UHP		AT91SAM926x_PMC_UHP
 #define ATMEL_BASE_PIO		ATMEL_BASE_PIOA
+#endif
+#define ATMEL_PMC_UHP		AT91SAM926x_PMC_UHP
 
 /*
  * SoC specific defines

@@ -188,6 +188,7 @@ obj-y += usb.o usb_hub.o
 obj-$(CONFIG_USB_STORAGE) += usb_storage.o
 endif
 obj-$(CONFIG_CMD_FASTBOOT) += cmd_fastboot.o
+obj-$(CONFIG_CMD_FS_UUID) += cmd_fs_uuid.o
 
 obj-$(CONFIG_CMD_USB_MASS_STORAGE) += cmd_usb_mass_storage.o
 obj-$(CONFIG_CMD_THOR_DOWNLOAD) += cmd_thordown.o
@@ -251,6 +252,9 @@ obj-$(CONFIG_BOUNCE_BUFFER) += bouncebuf.o
 obj-y += console.o
 obj-$(CONFIG_CROS_EC) += cros_ec.o
 obj-y += dlmalloc.o
+ifdef CONFIG_SYS_MALLOC_F_LEN
+obj-y += malloc_simple.o
+endif
 obj-y += image.o
 obj-$(CONFIG_ANDROID_BOOT_IMAGE) += image-android.o
 obj-$(CONFIG_OF_LIBFDT) += image-fdt.o

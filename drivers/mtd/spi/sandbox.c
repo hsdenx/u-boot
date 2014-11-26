@@ -315,7 +315,7 @@ int sandbox_erase_part(struct sandbox_spi_flash *sbsf, int size)
 	int ret;
 
 	while (size > 0) {
-		todo = min(size, sizeof(sandbox_sf_0xff));
+		todo = min(size, (int)sizeof(sandbox_sf_0xff));
 		ret = os_write(sbsf->fd, sandbox_sf_0xff, todo);
 		if (ret != todo)
 			return ret;
@@ -602,14 +602,14 @@ static int sandbox_sf_bind_bus_cs(struct sandbox_state *state, int busnum,
 		       spec, ret);
 		return ret;
 	}
-	ret = device_find_child_by_seq(bus, cs, true, &slave);
+	ret = spi_find_chip_select(bus, cs, &slave);
 	if (!ret) {
 		printf("Chip select %d already exists for spec '%s'\n", cs,
 		       spec);
 		return -EEXIST;
 	}
 
-	ret = spi_bind_device(bus, cs, "spi_flash_std", spec, &slave);
+	ret = device_bind_driver(bus, "spi_flash_std", spec, &slave);
 	if (ret)
 		return ret;
 

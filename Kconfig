@@ -58,6 +58,14 @@ config CC_OPTIMIZE_FOR_SIZE
 
 endmenu		# General setup
 
+menuconfig EXPERT
+        bool "Configure standard U-Boot features (expert users)"
+        help
+          This option allows certain base U-Boot options and settings
+          to be disabled or tweaked. This is for specialized
+          environments which can tolerate a "non-standard" U-Boot.
+          Only use this if you really know what you are doing.
+
 menu "Boot images"
 
 config SPL_BUILD
@@ -92,6 +100,28 @@ config TPL
 	default n
 	help
 	  If you want to build TPL as well as the normal image and SPL, say Y.
+
+config FIT
+	bool "Support Flattened Image Tree"
+	depends on !SPL_BUILD
+	help
+	  This option allows to boot the new uImage structrure,
+	  Flattened Image Tree.  FIT is formally a FDT, which can include
+	  images of various types (kernel, FDT blob, ramdisk, etc.)
+	  in a single blob.  To boot this new uImage structure,
+	  pass the the address of the blob to the "bootm" command.
+
+config FIT_VERBOSE
+	bool "Display verbose messages on FIT boot"
+	depends on FIT
+
+config FIT_SIGNATURE
+	bool "Enabel signature verification of FIT uImages"
+	depends on FIT
+	help
+	  This option enables signature verification of FIT uImages,
+	  using a hash signed and verified using RSA.
+	  See doc/uImage.FIT/signature.txt for more details.
 
 config SYS_EXTRA_OPTIONS
 	string "Extra Options (DEPRECATED)"
