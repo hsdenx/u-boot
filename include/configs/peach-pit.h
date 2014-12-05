@@ -23,8 +23,8 @@
 /* select serial console configuration */
 #define CONFIG_SERIAL3		/* use SERIAL 3 */
 
-#define CONFIG_SYS_PROMPT	"Peach # "
-#define CONFIG_IDENT_STRING	" for Peach"
+#define CONFIG_SYS_PROMPT	"Peach-Pit # "
+#define CONFIG_IDENT_STRING	" for Peach-Pit"
 
 #define CONFIG_VIDEO_PARADE
 
@@ -42,5 +42,9 @@
 
 #define CONFIG_USB_XHCI
 #define CONFIG_USB_XHCI_EXYNOS
+
+/* DRAM Memory Banks */
+#define CONFIG_NR_DRAM_BANKS	4
+#define SDRAM_BANK_SIZE		(512UL << 20UL)	/* 512 MB */
 
 #endif	/* __CONFIG_PEACH_PIT_H */
