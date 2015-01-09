@@ -20,6 +20,8 @@
 #include <fsl_esdhc.h>
 #include <mmc.h>
 #include <netdev.h>
+#include <usb.h>
+#include <usb/ehci-fsl.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -234,10 +236,52 @@ static int setup_fec(void)
 	/* clear gpr1[14], gpr1[18:17] to select anatop clock */
 	clrsetbits_le32(&iomuxc_regs->gpr[1], IOMUX_GPR1_FEC_MASK, 0);
 
-	return enable_fec_anatop_clock(ENET_50MHz);
+	return enable_fec_anatop_clock(ENET_50MHZ);
 }
 #endif
 
+#ifdef CONFIG_USB_EHCI_MX6
+#define USB_OTHERREGS_OFFSET	0x800
+#define UCTRL_PWR_POL		(1 << 9)
+
+static iomux_v3_cfg_t const usb_otg_pads[] = {
+	/* OTG1 */
+	MX6_PAD_KEY_COL4__USB_USBOTG1_PWR | MUX_PAD_CTRL(NO_PAD_CTRL),
+	MX6_PAD_EPDC_PWRCOM__ANATOP_USBOTG1_ID | MUX_PAD_CTRL(NO_PAD_CTRL),
+	/* OTG2 */
+	MX6_PAD_KEY_COL5__USB_USBOTG2_PWR | MUX_PAD_CTRL(NO_PAD_CTRL)
+};
+
+static void setup_usb(void)
+{
+	imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
+					 ARRAY_SIZE(usb_otg_pads));
+}
+
+int board_usb_phy_mode(int port)
+{
+	if (port == 1)
+		return USB_INIT_HOST;
+	else
+		return usb_phy_mode(port);
+}
+
+int board_ehci_hcd_init(int port)
+{
+	u32 *usbnc_usb_ctrl;
+
+	if (port > 1)
+		return -EINVAL;
+
+	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET +
+				 port * 4);
+
+	/* Set Power polarity */
+	setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
+
+	return 0;
+}
+#endif
 
 int board_early_init_f(void)
 {
@@ -256,12 +300,12 @@ int board_init(void)
 #ifdef	CONFIG_FEC_MXC
 	setup_fec();
 #endif
-	return 0;
-}
 
-u32 get_board_rev(void)
-{
-	return get_cpu_rev();
+#ifdef CONFIG_USB_EHCI_MX6
+	setup_usb();
+#endif
+
+	return 0;
 }
 
 int checkboard(void)

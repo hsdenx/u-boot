@@ -341,6 +341,10 @@ config TARGET_SPEAR600
 	bool "Support spear600"
 	select CPU_ARM926EJS
 
+config TARGET_STV0991
+	bool "Support stv0991"
+	select CPU_V7
+
 config TARGET_X600
 	bool "Support x600"
 	select CPU_ARM926EJS
@@ -396,8 +400,8 @@ config TARGET_MX35PDK
 	bool "Support mx35pdk"
 	select CPU_ARM1136
 
-config TARGET_RPI_B
-	bool "Support rpi_b"
+config TARGET_RPI
+	bool "Support rpi"
 	select CPU_ARM1176
 
 config TARGET_TNETV107X_EVM
@@ -650,6 +654,7 @@ config TARGET_KOSAGI_NOVENA
 
 config TARGET_TBS2910
 	bool "Support tbs2910"
+	select CPU_V7
 
 config TARGET_TQMA6
 	bool "TQ Systems TQMa6 board"
@@ -728,12 +733,14 @@ config TARGET_LS2085A_SIMU
 	select ARM64
 
 config TARGET_LS1021AQDS
-	bool "Support ls1021aqds_nor"
+	bool "Support ls1021aqds"
 	select CPU_V7
+	select SUPPORT_SPL
 
 config TARGET_LS1021ATWR
-	bool "Support ls1021atwr_nor"
+	bool "Support ls1021atwr"
 	select CPU_V7
+	select SUPPORT_SPL
 
 config TARGET_BALLOON3
 	bool "Support balloon3"
@@ -793,6 +800,7 @@ config ARCH_UNIPHIER
 	bool "Panasonic UniPhier platform"
 	select CPU_V7
 	select SUPPORT_SPL
+	select SPL
 	select OF_CONTROL if !SPL_BUILD
 
 endchoice
@@ -931,7 +939,7 @@ source "board/palmtreo680/Kconfig"
 source "board/phytec/pcm051/Kconfig"
 source "board/ppcag/bg0900/Kconfig"
 source "board/pxa255_idp/Kconfig"
-source "board/raspberrypi/rpi_b/Kconfig"
+source "board/raspberrypi/rpi/Kconfig"
 source "board/ronetix/pm9261/Kconfig"
 source "board/ronetix/pm9263/Kconfig"
 source "board/ronetix/pm9g45/Kconfig"
@@ -953,6 +961,7 @@ source "board/spear/spear600/Kconfig"
 source "board/spear/x600/Kconfig"
 source "board/st-ericsson/snowball/Kconfig"
 source "board/st-ericsson/u8500/Kconfig"
+source "board/st/stv0991/Kconfig"
 source "board/sunxi/Kconfig"
 source "board/syteco/jadecpu/Kconfig"
 source "board/syteco/zmx25/Kconfig"

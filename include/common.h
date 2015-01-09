@@ -70,12 +70,6 @@ typedef volatile unsigned char	vu_char;
 #ifdef	CONFIG_4xx
 #include <asm/ppc4xx.h>
 #endif
-#ifdef CONFIG_ARM
-#define asmlinkage	/* nothing */
-#endif
-#ifdef CONFIG_X86
-#define asmlinkage __attribute__((regparm(0)))
-#endif
 #ifdef CONFIG_BLACKFIN
 #include <asm/blackfin.h>
 #endif
@@ -421,10 +415,6 @@ int  eeprom_probe (unsigned dev_addr, unsigned offset);
 #endif
 int  eeprom_read  (unsigned dev_addr, unsigned offset, uchar *buffer, unsigned cnt);
 int  eeprom_write (unsigned dev_addr, unsigned offset, uchar *buffer, unsigned cnt);
-#ifdef CONFIG_LWMON
-extern uchar pic_read  (uchar reg);
-extern void  pic_write (uchar reg, uchar val);
-#endif
 
 /*
  * Set this up regardless of board
@@ -443,11 +433,6 @@ extern void spi_init_f (void);
 extern void spi_init_r (void);
 extern ssize_t spi_read	 (uchar *, int, uchar *, int);
 extern ssize_t spi_write (uchar *, int, uchar *, int);
-#endif
-
-#ifdef CONFIG_HERMES
-/* $(BOARD)/hermes.c */
-void hermes_start_lxt980 (int speed);
 #endif
 
 #ifdef CONFIG_EVB64260

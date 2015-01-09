@@ -14,6 +14,9 @@ alias aaribaud       Albert Aribaud <albert.u.boot@aribaud.net>
 alias abiessmann     Andreas Bießmann <andreas.devel@googlemail.com>
 alias afleming       Andy Fleming <afleming@gmail.com>
 alias ag             Anatolij Gustschin <agust@denx.de>
+alias alisonwang     Alison Wang <alison.wang@freescale.com>
+alias angelo_ts      Angelo Dureghello <angelo@sysam.it>
+alias danielschwierzeck Daniel Schwierzeck <daniel.schwierzeck@gmail.com>
 alias galak          Kumar Gala <galak@kernel.crashing.org>
 alias gruss          Graeme Russ <graeme.russ@gmail.com>
 alias hs             Heiko Schocher <hs@denx.de>
@@ -72,13 +75,13 @@ alias avr32          uboot, abiessmann
 alias bfin           uboot, vapier, sonic
 alias blackfin       bfin
 
-alias m68k           uboot, jasonjin
+alias m68k           uboot, alisonwang, angelo_ts
 alias coldfire       m68k
 
 alias microblaze     uboot, monstr
 alias mb             microblaze
 
-alias mips           uboot, Shinya Kuribayashi <skuribay@pobox.com>
+alias mips           uboot, danielschwierzeck
 
 alias nds32          uboot, macpaul
 
@@ -119,6 +122,7 @@ alias mmc            uboot, panto
 alias nand           uboot, scottwood
 alias net            uboot, jhersh
 alias spi	     uboot, jagan
+alias ubi            uboot, hs
 alias usb            uboot, marex
 alias video          uboot, ag
 alias patman         uboot, sjg

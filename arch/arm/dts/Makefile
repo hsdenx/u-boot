@@ -13,7 +13,8 @@ dtb-$(CONFIG_EXYNOS5) += exynos5250-arndale.dtb \
 	exynos5250-smdk5250.dtb \
 	exynos5420-smdk5420.dtb \
 	exynos5420-peach-pit.dtb \
-	exynos5800-peach-pi.dtb
+	exynos5800-peach-pi.dtb \
+	exynos5422-odroidxu3.dtb
 dtb-$(CONFIG_TEGRA) += tegra20-harmony.dtb \
 	tegra20-medcom-wide.dtb \
 	tegra20-paz00.dtb \
@@ -31,8 +32,10 @@ dtb-$(CONFIG_TEGRA) += tegra20-harmony.dtb \
 	tegra30-tec-ng.dtb \
 	tegra114-dalmore.dtb \
 	tegra124-jetson-tk1.dtb \
+	tegra124-nyan-big.dtb \
 	tegra124-venice2.dtb
 dtb-$(CONFIG_ARCH_UNIPHIER) += \
+	uniphier-ph1-sld3-ref.dtb \
 	uniphier-ph1-pro4-ref.dtb \
 	uniphier-ph1-ld4-ref.dtb \
 	uniphier-ph1-sld8-ref.dtb

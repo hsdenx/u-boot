@@ -128,6 +128,12 @@ T:	git git://git.denx.de/u-boot-stm.git
 F:	arch/arm/cpu/arm926ejs/spear/
 F:	arch/arm/include/asm/arch-spear/
 
+ARM STM STV0991
+M:	Vikas Manocha <vikas.manocha@st.com>
+S:	Maintained
+F:	arch/arm/cpu/armv7/stv0991/
+F:	arch/arm/include/asm/arch-stv0991/
+
 ARM SUNXI
 M:	Ian Campbell <ijc@hellion.org.uk>
 M:	Hans De Goede <hdegoede@redhat.com>
@@ -196,7 +202,8 @@ F:	drivers/mtd/cfi_flash.c
 F:	drivers/mtd/jedec_flash.c
 
 COLDFIRE
-M:	Jason Jin <jason.jin@freescale.com>
+M:	Huan Wang <alison.wang@freescale.com>
+M:	Angelo Dureghello <angelo@sysam.it>
 S:	Maintained
 T:	git git://git.denx.de/u-boot-coldfire.git
 F:	arch/m68k/
@@ -390,6 +397,7 @@ T:	git git://git.denx.de/u-boot-tq-group.git
 
 UBI
 M:	Kyungmin Park <kmpark@infradead.org>
+M:	Heiko Schocher <hs@denx.de>
 S:	Maintained
 T:	git git://git.denx.de/u-boot-ubi.git
 F:	drivers/mtd/ubi/

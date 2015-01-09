@@ -434,6 +434,56 @@ static u32 get_mmdc_ch0_clk(void)
 }
 #endif
 
+#ifdef CONFIG_MX6SX
+/* qspi_num can be from 0 - 1 */
+void enable_qspi_clk(int qspi_num)
+{
+	u32 reg = 0;
+	/* Enable QuadSPI clock */
+	switch (qspi_num) {
+	case 0:
+		/* disable the clock gate */
+		clrbits_le32(&imx_ccm->CCGR3, MXC_CCM_CCGR3_QSPI1_MASK);
+
+		/* set 50M  : (50 = 396 / 2 / 4) */
+		reg = readl(&imx_ccm->cscmr1);
+		reg &= ~(MXC_CCM_CSCMR1_QSPI1_PODF_MASK |
+			 MXC_CCM_CSCMR1_QSPI1_CLK_SEL_MASK);
+		reg |= ((1 << MXC_CCM_CSCMR1_QSPI1_PODF_OFFSET) |
+			(2 << MXC_CCM_CSCMR1_QSPI1_CLK_SEL_OFFSET));
+		writel(reg, &imx_ccm->cscmr1);
+
+		/* enable the clock gate */
+		setbits_le32(&imx_ccm->CCGR3, MXC_CCM_CCGR3_QSPI1_MASK);
+		break;
+	case 1:
+		/*
+		 * disable the clock gate
+		 * QSPI2 and GPMI_BCH_INPUT_GPMI_IO share the same clock gate,
+		 * disable both of them.
+		 */
+		clrbits_le32(&imx_ccm->CCGR4, MXC_CCM_CCGR4_QSPI2_ENFC_MASK |
+			     MXC_CCM_CCGR4_RAWNAND_U_GPMI_BCH_INPUT_GPMI_IO_MASK);
+
+		/* set 50M  : (50 = 396 / 2 / 4) */
+		reg = readl(&imx_ccm->cs2cdr);
+		reg &= ~(MXC_CCM_CS2CDR_QSPI2_CLK_PODF_MASK |
+			 MXC_CCM_CS2CDR_QSPI2_CLK_PRED_MASK |
+			 MXC_CCM_CS2CDR_QSPI2_CLK_SEL_MASK);
+		reg |= (MXC_CCM_CS2CDR_QSPI2_CLK_PRED(0x1) |
+			MXC_CCM_CS2CDR_QSPI2_CLK_SEL(0x3));
+		writel(reg, &imx_ccm->cs2cdr);
+
+		/*enable the clock gate*/
+		setbits_le32(&imx_ccm->CCGR4, MXC_CCM_CCGR4_QSPI2_ENFC_MASK |
+			     MXC_CCM_CCGR4_RAWNAND_U_GPMI_BCH_INPUT_GPMI_IO_MASK);
+		break;
+	default:
+		break;
+	}
+}
+#endif
+
 #ifdef CONFIG_FEC_MXC
 int enable_fec_anatop_clock(enum enet_freq freq)
 {
@@ -443,7 +493,7 @@ int enable_fec_anatop_clock(enum enet_freq freq)
 	struct anatop_regs __iomem *anatop =
 		(struct anatop_regs __iomem *)ANATOP_BASE_ADDR;
 
-	if (freq < ENET_25MHz || freq > ENET_125MHz)
+	if (freq < ENET_25MHZ || freq > ENET_125MHZ)
 		return -EINVAL;
 
 	reg = readl(&anatop->pll_enet);
@@ -746,10 +796,11 @@ unsigned int mxc_get_clock(enum mxc_clock clk)
 	case MXC_SATA_CLK:
 		return get_ahb_clk();
 	default:
+		printf("Unsupported MXC CLK: %d\n", clk);
 		break;
 	}
 
-	return -1;
+	return 0;
 }
 
 /*

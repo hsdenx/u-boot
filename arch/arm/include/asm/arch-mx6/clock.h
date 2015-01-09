@@ -43,10 +43,10 @@ enum mxc_clock {
 };
 
 enum enet_freq {
-	ENET_25MHz,
-	ENET_50MHz,
-	ENET_100MHz,
-	ENET_125MHz,
+	ENET_25MHZ,
+	ENET_50MHZ,
+	ENET_100MHZ,
+	ENET_125MHZ,
 };
 
 u32 imx_get_uartclk(void);
@@ -67,5 +67,6 @@ int enable_spi_clk(unsigned char enable, unsigned spi_num);
 void enable_ipu_clock(void);
 int enable_fec_anatop_clock(enum enet_freq freq);
 void enable_enet_clk(unsigned char enable);
+void enable_qspi_clk(int qspi_num);
 void enable_thermal_clk(void);
 #endif /* __ASM_ARCH_CLOCK_H */

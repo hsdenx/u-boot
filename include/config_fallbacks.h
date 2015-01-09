@@ -79,12 +79,22 @@
 #define CONFIG_SYS_PROMPT	"=> "
 #endif
 
+#ifndef CONFIG_SYS_PBSIZE
+#define CONFIG_SYS_PBSIZE	(CONFIG_SYS_CBSIZE + 128)
+#endif
+
 #ifndef CONFIG_FIT_SIGNATURE
 #define CONFIG_IMAGE_FORMAT_LEGACY
 #endif
 
 #ifdef CONFIG_DISABLE_IMAGE_LEGACY
 #undef CONFIG_IMAGE_FORMAT_LEGACY
+#endif
+
+#ifdef CONFIG_DM_I2C
+# ifdef CONFIG_SYS_I2C
+#  error "Cannot define CONFIG_SYS_I2C when CONFIG_DM_I2C is used"
+# endif
 #endif
 
 #endif	/* __CONFIG_FALLBACKS_H */

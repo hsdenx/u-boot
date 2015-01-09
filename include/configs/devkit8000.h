@@ -21,6 +21,7 @@
 #define CONFIG_MACH_TYPE	MACH_TYPE_DEVKIT8000
 #define CONFIG_OMAP_GPIO
 #define CONFIG_OMAP_COMMON
+#define CONFIG_SYS_GENERIC_BOARD
 
 /*
  * 1MB into the SDRAM to allow for SPL's bss at the beginning of SDRAM
@@ -299,7 +300,7 @@
 #define CONFIG_SPL_FAT_SUPPORT
 #define CONFIG_SPL_LDSCRIPT		"$(CPUDIR)/omap-common/u-boot-spl.lds"
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME        "u-boot.img"
-#define CONFIG_SYS_MMC_SD_FS_BOOT_PARTITION    1
+#define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION     1
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR 0x300 /* address 0x60000 */
 
 #define CONFIG_SPL_TEXT_BASE		0x40200000 /*CONFIG_SYS_SRAM_START*/

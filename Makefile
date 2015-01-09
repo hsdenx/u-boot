@@ -1,7 +1,7 @@
 VERSION = 2015
 PATCHLEVEL = 01
 SUBLEVEL =
-EXTRAVERSION = -rc2
+EXTRAVERSION = -rc4
 NAME =
 
 # *DOCUMENTATION*
@@ -503,6 +503,7 @@ autoconf_is_current := $(if $(wildcard $(KCONFIG_CONFIG)),$(shell find . \
 		-path ./include/config/auto.conf -newer $(KCONFIG_CONFIG)))
 ifneq ($(autoconf_is_current),)
 include $(srctree)/config.mk
+include $(srctree)/arch/$(ARCH)/Makefile
 endif
 
 # If board code explicitly specified LDSCRIPT or CONFIG_SYS_LDSCRIPT, use
@@ -601,17 +602,11 @@ c_flags := $(KBUILD_CFLAGS) $(cpp_flags)
 #########################################################################
 # U-Boot objects....order is important (i.e. start must be first)
 
-head-y := $(CPUDIR)/start.o
-head-$(CONFIG_4xx) += arch/powerpc/cpu/ppc4xx/resetvec.o
-head-$(CONFIG_MPC85xx) += arch/powerpc/cpu/mpc85xx/resetvec.o
-
 HAVE_VENDOR_COMMON_LIB = $(if $(wildcard $(srctree)/board/$(VENDOR)/common/Makefile),y,n)
 
 libs-y += lib/
 libs-$(HAVE_VENDOR_COMMON_LIB) += board/$(VENDOR)/common/
-libs-y += $(CPUDIR)/
 libs-$(CONFIG_OF_EMBED) += dts/
-libs-y += arch/$(ARCH)/lib/
 libs-y += fs/
 libs-y += net/
 libs-y += disk/
@@ -645,22 +640,10 @@ libs-y += drivers/usb/musb-new/
 libs-y += drivers/usb/phy/
 libs-y += drivers/usb/ulpi/
 libs-y += common/
-libs-y += lib/libfdt/
 libs-$(CONFIG_API) += api/
 libs-$(CONFIG_HAS_POST) += post/
 libs-y += test/
 libs-y += test/dm/
-
-ifneq (,$(filter $(SOC), mx25 mx27 mx5 mx6 mx31 mx35 mxs vf610))
-libs-y += arch/$(ARCH)/imx-common/
-endif
-
-ifneq (,$(filter $(SOC), armada-xp kirkwood))
-libs-y += arch/$(ARCH)/mvebu-common/
-endif
-
-libs-$(CONFIG_ARM) += arch/arm/cpu/
-libs-$(CONFIG_PPC) += arch/powerpc/cpu/
 
 libs-y += $(if $(BOARDDIR),board/$(BOARDDIR)/)
 
@@ -963,27 +946,43 @@ u-boot-nand.gph: u-boot.bin FORCE
 ifneq ($(CONFIG_X86_RESET_VECTOR),)
 rom: u-boot.rom FORCE
 
-u-boot.rom: u-boot-x86-16bit.bin u-boot-dtb.bin \
-		$(srctree)/board/$(BOARDDIR)/mrc.bin
-	$(objtree)/tools/ifdtool -c -r $(CONFIG_ROM_SIZE) u-boot.tmp
-	if [ -n "$(CONFIG_HAVE_INTEL_ME)" ]; then \
-		$(objtree)/tools/ifdtool -D \
-			$(srctree)/board/$(BOARDDIR)/descriptor.bin u-boot.tmp; \
-		$(objtree)/tools/ifdtool \
-			-i ME:$(srctree)/board/$(BOARDDIR)/me.bin u-boot.tmp; \
-	fi
-	$(objtree)/tools/ifdtool -w \
-		$(CONFIG_SYS_TEXT_BASE):$(objtree)/u-boot-dtb.bin u-boot.tmp
-	$(objtree)/tools/ifdtool -w \
-		$(CONFIG_X86_MRC_START):$(srctree)/board/$(BOARDDIR)/mrc.bin \
-		u-boot.tmp
-	$(objtree)/tools/ifdtool -w \
-		$(CONFIG_SYS_X86_START16):$(objtree)/u-boot-x86-16bit.bin \
-		u-boot.tmp
-	$(objtree)/tools/ifdtool -w \
-		$(CONFIG_X86_OPTION_ROM_ADDR):$(srctree)/board/$(BOARDDIR)/$(CONFIG_X86_OPTION_ROM_FILENAME) \
-		u-boot.tmp
-	mv u-boot.tmp $@
+IFDTOOL=$(objtree)/tools/ifdtool
+IFDTOOL_FLAGS  = -f 0:$(objtree)/u-boot.dtb
+IFDTOOL_FLAGS += -m 0x$(shell $(NM) u-boot |grep _dt_ucode_base_size |cut -d' ' -f1)
+IFDTOOL_FLAGS += -U $(CONFIG_SYS_TEXT_BASE):$(objtree)/u-boot.bin
+IFDTOOL_FLAGS += -w $(CONFIG_SYS_X86_START16):$(objtree)/u-boot-x86-16bit.bin
+
+ifneq ($(CONFIG_HAVE_INTEL_ME),)
+IFDTOOL_ME_FLAGS  = -D $(srctree)/board/$(BOARDDIR)/descriptor.bin
+IFDTOOL_ME_FLAGS += -i ME:$(srctree)/board/$(BOARDDIR)/me.bin
+endif
+
+ifneq ($(CONFIG_HAVE_MRC),)
+IFDTOOL_FLAGS += -w $(CONFIG_X86_MRC_ADDR):$(srctree)/board/$(BOARDDIR)/mrc.bin
+endif
+
+ifneq ($(CONFIG_HAVE_FSP),)
+IFDTOOL_FLAGS += -w $(CONFIG_FSP_ADDR):$(srctree)/board/$(BOARDDIR)/$(CONFIG_FSP_FILE)
+endif
+
+ifneq ($(CONFIG_HAVE_CMC),)
+IFDTOOL_FLAGS += -w $(CONFIG_CMC_ADDR):$(srctree)/board/$(BOARDDIR)/$(CONFIG_CMC_FILE)
+endif
+
+ifneq ($(CONFIG_X86_OPTION_ROM_ADDR),)
+IFDTOOL_FLAGS += -w $(CONFIG_X86_OPTION_ROM_ADDR):$(srctree)/board/$(BOARDDIR)/$(CONFIG_X86_OPTION_ROM_FILE)
+endif
+
+quiet_cmd_ifdtool = IFDTOOL $@
+cmd_ifdtool  = $(IFDTOOL) -c -r $(CONFIG_ROM_SIZE) u-boot.tmp;
+ifneq ($(CONFIG_HAVE_INTEL_ME),)
+cmd_ifdtool += $(IFDTOOL) $(IFDTOOL_ME_FLAGS) u-boot.tmp;
+endif
+cmd_ifdtool += $(IFDTOOL) $(IFDTOOL_FLAGS) u-boot.tmp;
+cmd_ifdtool += mv u-boot.tmp $@
+
+u-boot.rom: u-boot-x86-16bit.bin u-boot-dtb.bin
+	$(call if_changed,ifdtool)
 
 OBJCOPYFLAGS_u-boot-x86-16bit.bin := -O binary -j .start16 -j .resetvec
 u-boot-x86-16bit.bin: u-boot FORCE
@@ -1016,15 +1015,22 @@ u-boot-img.bin: spl/u-boot-spl.bin u-boot.img FORCE
 #concatenated with u-boot binary. It is need by PowerPC SoC having
 #internal SRAM <= 512KB.
 MKIMAGEFLAGS_u-boot-spl.pbl = -n $(srctree)/$(CONFIG_SYS_FSL_PBL_RCW:"%"=%) \
-		-R $(srctree)/$(CONFIG_SYS_FSL_PBL_PBI:"%"=%) -T pblimage
+		-R $(srctree)/$(CONFIG_SYS_FSL_PBL_PBI:"%"=%) -T pblimage \
+		-A $(ARCH) -a $(CONFIG_SPL_TEXT_BASE)
 
 spl/u-boot-spl.pbl: spl/u-boot-spl.bin FORCE
 	$(call if_changed,mkimage)
 
+ifeq ($(ARCH),arm)
+UBOOT_BINLOAD := u-boot.img
+else
+UBOOT_BINLOAD := u-boot.bin
+endif
+
 OBJCOPYFLAGS_u-boot-with-spl-pbl.bin = -I binary -O binary --pad-to=$(CONFIG_SPL_PAD_TO) \
 			  --gap-fill=0xff
 
-u-boot-with-spl-pbl.bin: spl/u-boot-spl.pbl u-boot.bin FORCE
+u-boot-with-spl-pbl.bin: spl/u-boot-spl.pbl $(UBOOT_BINLOAD) FORCE
 	$(call if_changed,pad_cat)
 
 # PPC4xx needs the SPL at the end of the image, since the reset vector

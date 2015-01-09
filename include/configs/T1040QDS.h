@@ -28,6 +28,8 @@
  */
 #define CONFIG_T1040QDS
 #define CONFIG_PHYS_64BIT
+#define CONFIG_SYS_GENERIC_BOARD
+#define CONFIG_DISPLAY_BOARDINFO
 
 #ifdef CONFIG_RAMBOOT_PBL
 #define CONFIG_RAMBOOT_TEXT_BASE	CONFIG_SYS_TEXT_BASE
@@ -176,8 +178,8 @@ unsigned long get_board_ddr_clk(void);
 #define CONFIG_DDR_SPD
 #ifndef CONFIG_SYS_FSL_DDR4
 #define CONFIG_SYS_FSL_DDR3
-#define CONFIG_FSL_DDR_INTERACTIVE
 #endif
+#define CONFIG_FSL_DDR_INTERACTIVE
 
 #define CONFIG_SYS_SPD_BUS_NUM	0
 #define SPD_EEPROM_ADDRESS	0x51
@@ -603,14 +605,30 @@ unsigned long get_board_ddr_clk(void);
 /* Qman/Bman */
 #ifndef CONFIG_NOBQFMAN
 #define CONFIG_SYS_DPAA_QBMAN		/* Support Q/Bman */
-#define CONFIG_SYS_BMAN_NUM_PORTALS	25
+#define CONFIG_SYS_BMAN_NUM_PORTALS	10
 #define CONFIG_SYS_BMAN_MEM_BASE	0xf4000000
 #define CONFIG_SYS_BMAN_MEM_PHYS	0xff4000000ull
 #define CONFIG_SYS_BMAN_MEM_SIZE	0x02000000
-#define CONFIG_SYS_QMAN_NUM_PORTALS	25
+#define CONFIG_SYS_BMAN_SP_CENA_SIZE    0x4000
+#define CONFIG_SYS_BMAN_SP_CINH_SIZE    0x1000
+#define CONFIG_SYS_BMAN_CENA_BASE       CONFIG_SYS_BMAN_MEM_BASE
+#define CONFIG_SYS_BMAN_CENA_SIZE       (CONFIG_SYS_BMAN_MEM_SIZE >> 1)
+#define CONFIG_SYS_BMAN_CINH_BASE       (CONFIG_SYS_BMAN_MEM_BASE + \
+					CONFIG_SYS_BMAN_CENA_SIZE)
+#define CONFIG_SYS_BMAN_CINH_SIZE       (CONFIG_SYS_BMAN_MEM_SIZE >> 1)
+#define CONFIG_SYS_BMAN_SWP_ISDR_REG	0xE08
+#define CONFIG_SYS_QMAN_NUM_PORTALS	10
 #define CONFIG_SYS_QMAN_MEM_BASE	0xf6000000
 #define CONFIG_SYS_QMAN_MEM_PHYS	0xff6000000ull
 #define CONFIG_SYS_QMAN_MEM_SIZE	0x02000000
+#define CONFIG_SYS_QMAN_SP_CENA_SIZE    0x4000
+#define CONFIG_SYS_QMAN_SP_CINH_SIZE    0x1000
+#define CONFIG_SYS_QMAN_CENA_BASE       CONFIG_SYS_QMAN_MEM_BASE
+#define CONFIG_SYS_QMAN_CENA_SIZE       (CONFIG_SYS_QMAN_MEM_SIZE >> 1)
+#define CONFIG_SYS_QMAN_CINH_BASE       (CONFIG_SYS_QMAN_MEM_BASE + \
+					CONFIG_SYS_QMAN_CENA_SIZE)
+#define CONFIG_SYS_QMAN_CINH_SIZE       (CONFIG_SYS_QMAN_MEM_SIZE >> 1)
+#define CONFIG_SYS_QMAN_SWP_ISDR_REG	0xE08
 
 #define CONFIG_SYS_DPAA_FMAN
 #define CONFIG_SYS_DPAA_PME
@@ -768,8 +786,7 @@ unsigned long get_board_ddr_clk(void);
 #define __USB_PHY_TYPE	utmi
 
 #define	CONFIG_EXTRA_ENV_SETTINGS				\
-	"hwconfig=fsl_ddr:ctlr_intlv=cacheline,"		\
-	"bank_intlv=cs0_cs1;"					\
+	"hwconfig=fsl_ddr:bank_intlv=auto;"			\
 	"usb1:dr_mode=host,phy_type=" __stringify(__USB_PHY_TYPE) "\0"\
 	"netdev=eth0\0"						\
 	"video-mode=fslfb:1024x768-32@60,monitor=dvi\0"		\

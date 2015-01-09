@@ -26,6 +26,8 @@
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
 #include "../common/pfuze.h"
+#include <usb.h>
+#include <usb/ehci-fsl.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -168,7 +170,7 @@ static int setup_fec(void)
 	reg |= BM_ANADIG_PLL_ENET_REF_25M_ENABLE;
 	writel(reg, &anatop->pll_enet);
 
-	return enable_fec_anatop_clock(ENET_125MHz);
+	return enable_fec_anatop_clock(ENET_125MHZ);
 }
 
 int board_eth_init(bd_t *bis)
@@ -212,6 +214,49 @@ int power_init_board(void)
 	return 0;
 }
 
+#ifdef CONFIG_USB_EHCI_MX6
+#define USB_OTHERREGS_OFFSET	0x800
+#define UCTRL_PWR_POL		(1 << 9)
+
+static iomux_v3_cfg_t const usb_otg_pads[] = {
+	/* OGT1 */
+	MX6_PAD_GPIO1_IO09__USB_OTG1_PWR | MUX_PAD_CTRL(NO_PAD_CTRL),
+	MX6_PAD_GPIO1_IO10__ANATOP_OTG1_ID | MUX_PAD_CTRL(NO_PAD_CTRL),
+	/* OTG2 */
+	MX6_PAD_GPIO1_IO12__USB_OTG2_PWR | MUX_PAD_CTRL(NO_PAD_CTRL)
+};
+
+static void setup_usb(void)
+{
+	imx_iomux_v3_setup_multiple_pads(usb_otg_pads,
+					 ARRAY_SIZE(usb_otg_pads));
+}
+
+int board_usb_phy_mode(int port)
+{
+	if (port == 1)
+		return USB_INIT_HOST;
+	else
+		return usb_phy_mode(port);
+}
+
+int board_ehci_hcd_init(int port)
+{
+	u32 *usbnc_usb_ctrl;
+
+	if (port > 1)
+		return -EINVAL;
+
+	usbnc_usb_ctrl = (u32 *)(USB_BASE_ADDR + USB_OTHERREGS_OFFSET +
+				 port * 4);
+
+	/* Set Power polarity */
+	setbits_le32(usbnc_usb_ctrl, UCTRL_PWR_POL);
+
+	return 0;
+}
+#endif
+
 int board_phy_config(struct phy_device *phydev)
 {
 	/*
@@ -241,6 +286,10 @@ int board_early_init_f(void)
 
 	/* Active high for ncp692 */
 	gpio_direction_output(IMX_GPIO_NR(4, 16) , 1);
+
+#ifdef CONFIG_USB_EHCI_MX6
+	setup_usb();
+#endif
 
 	return 0;
 }
@@ -322,6 +371,41 @@ int board_mmc_init(bd_t *bis)
 	return 0;
 }
 
+#ifdef CONFIG_FSL_QSPI
+
+#define QSPI_PAD_CTRL1	\
+	(PAD_CTL_SRE_FAST | PAD_CTL_SPEED_HIGH | \
+	 PAD_CTL_PKE | PAD_CTL_PUE | PAD_CTL_PUS_47K_UP | PAD_CTL_DSE_40ohm)
+
+static iomux_v3_cfg_t const quadspi_pads[] = {
+	MX6_PAD_NAND_WP_B__QSPI2_A_DATA_0	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_READY_B__QSPI2_A_DATA_1	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_CE0_B__QSPI2_A_DATA_2	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_CE1_B__QSPI2_A_DATA_3	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_ALE__QSPI2_A_SS0_B		| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_CLE__QSPI2_A_SCLK		| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_DATA07__QSPI2_A_DQS	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_DATA01__QSPI2_B_DATA_0	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_DATA00__QSPI2_B_DATA_1	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_WE_B__QSPI2_B_DATA_2	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_RE_B__QSPI2_B_DATA_3	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_DATA03__QSPI2_B_SS0_B	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_DATA02__QSPI2_B_SCLK	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+	MX6_PAD_NAND_DATA05__QSPI2_B_DQS	| MUX_PAD_CTRL(QSPI_PAD_CTRL1),
+};
+
+int board_qspi_init(void)
+{
+	/* Set the iomux */
+	imx_iomux_v3_setup_multiple_pads(quadspi_pads,
+					 ARRAY_SIZE(quadspi_pads));
+
+	/* Set the clock */
+	enable_qspi_clk(1);
+
+	return 0;
+}
+#endif
 
 int board_init(void)
 {
@@ -330,6 +414,10 @@ int board_init(void)
 
 #ifdef CONFIG_SYS_I2C_MXC
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
+#endif
+
+#ifdef CONFIG_FSL_QSPI
+	board_qspi_init();
 #endif
 
 	return 0;

@@ -72,30 +72,39 @@ static int pl01x_tstc(struct pl01x_regs *regs)
 static int pl01x_generic_serial_init(struct pl01x_regs *regs,
 				     enum pl01x_type type)
 {
-	unsigned int lcr;
-
+	switch (type) {
+	case TYPE_PL010:
+		/* disable everything */
+		writel(0, &regs->pl010_cr);
+		break;
+	case TYPE_PL011:
 #ifdef CONFIG_PL011_SERIAL_FLUSH_ON_INIT
-	if (type == TYPE_PL011) {
 		/* Empty RX fifo if necessary */
 		if (readl(&regs->pl011_cr) & UART_PL011_CR_UARTEN) {
 			while (!(readl(&regs->fr) & UART_PL01x_FR_RXFE))
 				readl(&regs->dr);
 		}
-	}
 #endif
-
-	/* First, disable everything */
-	writel(0, &regs->pl010_cr);
-
-	/* Set the UART to be 8 bits, 1 stop bit, no parity, fifo enabled */
-	lcr = UART_PL011_LCRH_WLEN_8 | UART_PL011_LCRH_FEN;
-	writel(lcr, &regs->pl011_lcrh);
-
-	switch (type) {
-	case TYPE_PL010:
+		/* disable everything */
+		writel(0, &regs->pl011_cr);
 		break;
-	case TYPE_PL011: {
+	default:
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+static int set_line_control(struct pl01x_regs *regs)
+{
+	unsigned int lcr;
+	/*
+	 * Internal update of baud rate register require line
+	 * control register write
+	 */
+	lcr = UART_PL011_LCRH_WLEN_8 | UART_PL011_LCRH_FEN;
 #ifdef CONFIG_PL011_SERIAL_RLCR
+	{
 		int i;
 
 		/*
@@ -107,15 +116,9 @@ static int pl01x_generic_serial_init(struct pl01x_regs *regs,
 			writel(lcr, &regs->fr);
 
 		writel(lcr, &regs->pl011_rlcr);
-		/* lcrh needs to be set again for change to be effective */
-		writel(lcr, &regs->pl011_lcrh);
+	}
 #endif
-		break;
-	}
-	default:
-		return -EINVAL;
-	}
-
+	writel(lcr, &regs->pl011_lcrh);
 	return 0;
 }
 
@@ -175,6 +178,7 @@ static int pl01x_generic_setbrg(struct pl01x_regs *regs, enum pl01x_type type,
 		writel(divider, &regs->pl011_ibrd);
 		writel(fraction, &regs->pl011_fbrd);
 
+		set_line_control(regs);
 		/* Finally, enable the UART */
 		writel(UART_PL011_CR_UARTEN | UART_PL011_CR_TXE |
 		       UART_PL011_CR_RXE | UART_PL011_CR_RTS, &regs->pl011_cr);
@@ -201,7 +205,7 @@ static void pl01x_serial_init_baud(int baudrate)
 	base_regs = (struct pl01x_regs *)port[CONFIG_CONS_INDEX];
 
 	pl01x_generic_serial_init(base_regs, pl01x_type);
-	pl01x_generic_setbrg(base_regs, TYPE_PL010, clock, baudrate);
+	pl01x_generic_setbrg(base_regs, pl01x_type, clock, baudrate);
 }
 
 /*
@@ -344,6 +348,7 @@ U_BOOT_DRIVER(serial_pl01x) = {
 	.probe = pl01x_serial_probe,
 	.ops	= &pl01x_serial_ops,
 	.flags = DM_FLAG_PRE_RELOC,
+	.priv_auto_alloc_size = sizeof(struct pl01x_priv),
 };
 
 #endif

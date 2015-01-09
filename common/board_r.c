@@ -265,6 +265,14 @@ static int initr_malloc(void)
 	return 0;
 }
 
+#ifdef CONFIG_SYS_NONCACHED_MEMORY
+static int initr_noncached(void)
+{
+	noncached_init();
+	return 0;
+}
+#endif
+
 #ifdef CONFIG_DM
 static int initr_dm(void)
 {
@@ -291,26 +299,14 @@ static int initr_flash(void)
 {
 	ulong flash_size = 0;
 	bd_t *bd = gd->bd;
-	int ok;
 
 	puts("Flash: ");
 
-	if (board_flash_wp_on()) {
+	if (board_flash_wp_on())
 		printf("Uninitialized - Write Protect On\n");
-		/* Since WP is on, we can't find real size.  Set to 0 */
-		ok = 1;
-	} else {
+	else
 		flash_size = flash_init();
-		ok = flash_size > 0;
-	}
-	if (!ok) {
-		puts("*** failed ***\n");
-#ifdef CONFIG_PPC
-		/* Why does PPC do this? */
-		hang();
-#endif
-		return -1;
-	}
+
 	print_size(flash_size, "");
 #ifdef CONFIG_SYS_FLASH_CHECKSUM
 	/*
@@ -453,24 +449,6 @@ static int initr_env(void)
 #endif /* CONFIG_SYS_EXTBDINFO */
 	return 0;
 }
-
-#ifdef	CONFIG_HERMES
-static int initr_hermes(void)
-{
-	if ((gd->board_type >> 16) == 2)
-		gd->bd->bi_ethspeed = gd->board_type & 0xFFFF;
-	else
-		gd->bd->bi_ethspeed = 0xFFFF;
-	return 0;
-}
-
-static int initr_hermes_start(void)
-{
-	if (gd->bd->bi_ethspeed != 0xFFFF)
-		hermes_start_lxt980((int) gd->bd->bi_ethspeed);
-	return 0;
-}
-#endif
 
 #ifdef CONFIG_SC3
 /* TODO: with new initcalls, move this into the driver */
@@ -717,6 +695,9 @@ init_fnc_t init_sequence_r[] = {
 #endif
 	initr_barrier,
 	initr_malloc,
+#ifdef CONFIG_SYS_NONCACHED_MEMORY
+	initr_noncached,
+#endif
 	bootstage_relocate,
 #ifdef CONFIG_DM
 	initr_dm,
@@ -803,9 +784,6 @@ init_fnc_t init_sequence_r[] = {
 #ifdef CONFIG_SC3
 	initr_sc3_read_eeprom,
 #endif
-#ifdef	CONFIG_HERMES
-	initr_hermes,
-#endif
 #if defined(CONFIG_ID_EEPROM) || defined(CONFIG_SYS_I2C_MAC_OFFSET)
 	mac_read_from_eeprom,
 #endif
@@ -830,9 +808,6 @@ init_fnc_t init_sequence_r[] = {
 #endif
 #ifdef CONFIG_MISC_INIT_R
 	misc_init_r,		/* miscellaneous platform-dependent init */
-#endif
-#ifdef CONFIG_HERMES
-	initr_hermes_start,
 #endif
 	INIT_FUNC_WATCHDOG_RESET
 #ifdef CONFIG_CMD_KGDB

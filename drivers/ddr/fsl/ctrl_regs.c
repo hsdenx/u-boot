@@ -253,22 +253,30 @@ static void set_csn_config_2(int i, fsl_ddr_cfg_regs_t *ddr)
 /* -3E = 667 CL5, -25 = CL6 800, -25E = CL5 800 */
 
 #if !defined(CONFIG_SYS_FSL_DDR1)
+/*
+ * Check DIMM configuration, return 2 if quad-rank or two dual-rank
+ * Return 1 if other two slots configuration. Return 0 if single slot.
+ */
 static inline int avoid_odt_overlap(const dimm_params_t *dimm_params)
 {
 #if CONFIG_DIMM_SLOTS_PER_CTLR == 1
 	if (dimm_params[0].n_ranks == 4)
-		return 1;
+		return 2;
 #endif
 
 #if CONFIG_DIMM_SLOTS_PER_CTLR == 2
 	if ((dimm_params[0].n_ranks == 2) &&
 		(dimm_params[1].n_ranks == 2))
-		return 1;
+		return 2;
 
 #ifdef CONFIG_FSL_DDR_FIRST_SLOT_QUAD_CAPABLE
 	if (dimm_params[0].n_ranks == 4)
-		return 1;
+		return 2;
 #endif
+
+	if ((dimm_params[0].n_ranks != 0) &&
+	    (dimm_params[2].n_ranks != 0))
+		return 1;
 #endif
 	return 0;
 }
@@ -316,6 +324,8 @@ static void set_timing_cfg_0(fsl_ddr_cfg_regs_t *ddr,
 #elif defined(CONFIG_SYS_FSL_DDR3)
 	unsigned int data_rate = get_ddr_freq(0);
 	int txp;
+	unsigned int ip_rev;
+	int odt_overlap;
 	/*
 	 * (tXARD and tXARDS). Empirical?
 	 * The DDR3 spec has not tXARD,
@@ -327,17 +337,45 @@ static void set_timing_cfg_0(fsl_ddr_cfg_regs_t *ddr,
 	 */
 	txp = max((int)mclk_ps * 3, (mclk_ps > 1540 ? 7500 : 6000));
 
-	tmrd_mclk = 4;
+	ip_rev = fsl_ddr_get_version();
+	if (ip_rev >= 0x40700) {
+		/*
+		 * MRS_CYC = max(tMRD, tMOD)
+		 * tMRD = 4nCK (8nCK for RDIMM)
+		 * tMOD = max(12nCK, 15ns)
+		 */
+		tmrd_mclk = max((unsigned int)12, picos_to_mclk(15000));
+	} else {
+		/*
+		 * MRS_CYC = tMRD
+		 * tMRD = 4nCK (8nCK for RDIMM)
+		 */
+		if (popts->registered_dimm_en)
+			tmrd_mclk = 8;
+		else
+			tmrd_mclk = 4;
+	}
+
 	/* set the turnaround time */
 
 	/*
-	 * for single quad-rank DIMM and two dual-rank DIMMs
+	 * for single quad-rank DIMM and two-slot DIMMs
 	 * to avoid ODT overlap
 	 */
-	if (avoid_odt_overlap(dimm_params)) {
+	odt_overlap = avoid_odt_overlap(dimm_params);
+	switch (odt_overlap) {
+	case 2:
 		twwt_mclk = 2;
 		trrt_mclk = 1;
+		break;
+	case 1:
+		twwt_mclk = 1;
+		trrt_mclk = 0;
+		break;
+	default:
+		break;
 	}
+
 	/* for faster clock, need more time for data setup */
 	trwt_mclk = (data_rate/1000000 > 1800) ? 2 : 1;
 
@@ -383,7 +421,7 @@ static void set_timing_cfg_0(fsl_ddr_cfg_regs_t *ddr,
 		);
 	debug("FSLDDR: timing_cfg_0 = 0x%08x\n", ddr->timing_cfg_0);
 }
-#endif	/* defined(CONFIG_SYS_FSL_DDR2) */
+#endif	/* !defined(CONFIG_SYS_FSL_DDR1) */
 
 /* DDR SDRAM Timing Configuration 3 (TIMING_CFG_3) */
 static void set_timing_cfg_3(fsl_ddr_cfg_regs_t *ddr,
