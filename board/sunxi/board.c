@@ -175,26 +175,20 @@ void sunxi_board_init(void)
 #endif
 #ifdef CONFIG_AXP221_POWER
 	power_failed = axp221_init();
-	power_failed |= axp221_set_dcdc1(3000);
-	power_failed |= axp221_set_dcdc2(1200);
-	power_failed |= axp221_set_dcdc3(1200);
-	power_failed |= axp221_set_dcdc4(1200);
-	power_failed |= axp221_set_dcdc5(1500);
-#if CONFIG_AXP221_DLDO1_VOLT != -1
+	power_failed |= axp221_set_dcdc1(CONFIG_AXP221_DCDC1_VOLT);
+	power_failed |= axp221_set_dcdc2(1200); /* A31:VDD-GPU, A23:VDD-SYS */
+	power_failed |= axp221_set_dcdc3(1200); /* VDD-CPU */
+#ifdef CONFIG_MACH_SUN6I
+	power_failed |= axp221_set_dcdc4(1200); /* A31:VDD-SYS */
+#else
+	power_failed |= axp221_set_dcdc4(0);    /* A23:unused */
+#endif
+	power_failed |= axp221_set_dcdc5(1500); /* VCC-DRAM */
 	power_failed |= axp221_set_dldo1(CONFIG_AXP221_DLDO1_VOLT);
-#endif
-#if CONFIG_AXP221_DLDO4_VOLT != -1
 	power_failed |= axp221_set_dldo4(CONFIG_AXP221_DLDO4_VOLT);
-#endif
-#if CONFIG_AXP221_ALDO1_VOLT != -1
 	power_failed |= axp221_set_aldo1(CONFIG_AXP221_ALDO1_VOLT);
-#endif
-#if CONFIG_AXP221_ALDO2_VOLT != -1
 	power_failed |= axp221_set_aldo2(CONFIG_AXP221_ALDO2_VOLT);
-#endif
-#if CONFIG_AXP221_ALDO3_VOLT != -1
 	power_failed |= axp221_set_aldo3(CONFIG_AXP221_ALDO3_VOLT);
-#endif
 #endif
 
 	printf("DRAM:");
@@ -217,22 +211,20 @@ void sunxi_board_init(void)
 #ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
-	if (!getenv("ethaddr")) {
-		uint32_t reg_val = readl(SUNXI_SID_BASE);
+	unsigned int sid[4];
 
-		if (reg_val) {
-			uint8_t mac_addr[6];
+	if (!getenv("ethaddr") && sunxi_get_sid(sid) == 0 &&
+			sid[0] != 0 && sid[3] != 0) {
+		uint8_t mac_addr[6];
 
-			mac_addr[0] = 0x02; /* Non OUI / registered MAC address */
-			mac_addr[1] = (reg_val >>  0) & 0xff;
-			reg_val = readl(SUNXI_SID_BASE + 0x0c);
-			mac_addr[2] = (reg_val >> 24) & 0xff;
-			mac_addr[3] = (reg_val >> 16) & 0xff;
-			mac_addr[4] = (reg_val >>  8) & 0xff;
-			mac_addr[5] = (reg_val >>  0) & 0xff;
+		mac_addr[0] = 0x02; /* Non OUI / registered MAC address */
+		mac_addr[1] = (sid[0] >>  0) & 0xff;
+		mac_addr[2] = (sid[3] >> 24) & 0xff;
+		mac_addr[3] = (sid[3] >> 16) & 0xff;
+		mac_addr[4] = (sid[3] >>  8) & 0xff;
+		mac_addr[5] = (sid[3] >>  0) & 0xff;
 
-			eth_setenv_enetaddr("ethaddr", mac_addr);
-		}
+		eth_setenv_enetaddr("ethaddr", mac_addr);
 	}
 
 	return 0;

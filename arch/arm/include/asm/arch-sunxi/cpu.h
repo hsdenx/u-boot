@@ -37,7 +37,7 @@
 #define SUNXI_MMC1_BASE			0x01c10000
 #define SUNXI_MMC2_BASE			0x01c11000
 #define SUNXI_MMC3_BASE			0x01c12000
-#ifndef CONFIG_MACH_SUN6I
+#if !defined CONFIG_MACH_SUN6I && !defined CONFIG_MACH_SUN8I
 #define SUNXI_USB0_BASE			0x01c13000
 #define SUNXI_USB1_BASE			0x01c14000
 #endif
@@ -45,7 +45,7 @@
 #define SUNXI_HDMI_BASE			0x01c16000
 #define SUNXI_SPI2_BASE			0x01c17000
 #define SUNXI_SATA_BASE			0x01c18000
-#ifndef CONFIG_MACH_SUN6I
+#if !defined CONFIG_MACH_SUN6I && !defined CONFIG_MACH_SUN8I
 #define SUNXI_PATA_BASE			0x01c19000
 #define SUNXI_ACE_BASE			0x01c1a000
 #define SUNXI_TVE1_BASE			0x01c1b000
@@ -128,7 +128,8 @@
 #define SUN6I_CPUCFG_BASE		0x01f01c00
 #define SUNXI_R_UART_BASE		0x01f02800
 #define SUNXI_R_PIO_BASE		0x01f02c00
-#define SUNXI_P2WI_BASE			0x01f03400
+#define SUN6I_P2WI_BASE			0x01f03400
+#define SUNXI_RSB_BASE			0x01f03400
 
 /* CoreSight Debug Module */
 #define SUNXI_CSDM_BASE			0x3f500000
@@ -139,9 +140,15 @@
 
 #define SUNXI_CPU_CFG			(SUNXI_TIMER_BASE + 0x13c)
 
+/* SS bonding ids used for cpu identification */
+#define SUNXI_SS_BOND_ID_A31		4
+#define SUNXI_SS_BOND_ID_A31S		5
+
 #ifndef __ASSEMBLY__
 void sunxi_board_init(void);
 void sunxi_reset(void);
+int sunxi_get_ss_bonding_id(void);
+int sunxi_get_sid(unsigned int *sid);
 #endif /* __ASSEMBLY__ */
 
 #endif /* _CPU_H */

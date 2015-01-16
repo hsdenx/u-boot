@@ -60,11 +60,8 @@
 /* UBI */
 #define CONFIG_CMD_UBI
 #define CONFIG_CMD_UBIFS
-#define CONFIG_CMD_MTDPARTS
 #define CONFIG_RBTREE
 #define CONFIG_LZO
-#define CONFIG_MTD_DEVICE
-#define CONFIG_MTD_PARTITIONS
 
 /* Dynamic MTD partition support */
 #define CONFIG_CMD_MTDPARTS
@@ -125,7 +122,10 @@
 #define CONFIG_BOOTDELAY		3
 
 #define CONFIG_LOADADDR			0x82000000
-#define CONFIG_SYS_TEXT_BASE		0x3f008000
+
+/* We boot from the gfxRAM area of the OCRAM. */
+#define CONFIG_SYS_TEXT_BASE		0x3f408000
+#define CONFIG_BOARD_SIZE_LIMIT		524288
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"script=boot.scr\0" \
