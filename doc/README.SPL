@@ -95,3 +95,45 @@ cflow will spit out a number of warnings as it does not parse
 the config files and picks functions based on #ifdef.  Parsing the '.i'
 files instead introduces another set of headaches.  These warnings are
 not usually important to understanding the flow, however.
+
+
+ARM SPL Control Flow
+--------------------
+
+Execution starts with start.S. Two main functions can be provided by the
+board implementation. The purpose and limitations of each is described below.
+After that, the common board_init_r() is called to perform the SPL task.
+
+lowlevel_init():
+	- purpose: essential init to permit execution to reach board_init_f()
+	- no global_data, but there is a stack
+	- must not set up SDRAM or use console
+	- must only do the bare minimum to allow execution to continue to
+		board_init_f()
+	- this is almost never needed
+	- return normally from this function
+
+board_init_f():
+	- purpose: set up the machine ready for running board_init_r():
+		i.e. SDRAM and serial UART
+	- global_data is available
+	- preloader_console_init() can be called here in extremis
+	- stack is in SRAM
+	- should set up SDRAM, and anything needed to make the UART work
+	- these is no need to clear BSS, it will be done by crt0.S
+	- must return normally from this function (don't call board_init_r()
+		directly)
+
+Here the BSS is cleared. If CONFIG_SPL_STACK_R is defined, then at this point
+the stack and global_data are relocated to below that address.
+
+board_init_r():
+	- purpose: main execution, common code
+	- global_data is available
+	- SDRAM is available
+	- stack is optionally in SDRAM, if CONFIG_SPL_STACK_R is defined and
+		points into SDRAM
+	- preloader_console_init() can be called here - typically this is
+		done by defining CONFIG_SPL_BOARD_INIT and then supplying a
+		spl_board_init() function containing this call
+	- loads U-Boot or (in falcon mode) Linux
