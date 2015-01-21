@@ -141,6 +141,7 @@ config TARGET_AT91SAM9263EK
 config TARGET_AT91SAM9M10G45EK
 	bool "Support at91sam9m10g45ek"
 	select CPU_ARM926EJS
+	select SUPPORT_SPL
 
 config TARGET_AT91SAM9N12EK
 	bool "Support at91sam9n12ek"
