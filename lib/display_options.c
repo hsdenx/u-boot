@@ -92,7 +92,7 @@ int print_buffer(ulong addr, const void *data, uint width, uint count,
 	} lb;
 	int i;
 #ifdef CONFIG_SYS_SUPPORT_64BIT_DATA
-	uint64_t __maybe_unsued x;
+	uint64_t x;
 #else
 	uint32_t __maybe_unused x;
 #endif
