@@ -92,14 +92,19 @@ matrix:
           CROSS_COMPILE="/opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/mips-linux-"
     - env:
         - TEST_CMD="tools/buildman/buildman --list-error-boards atmel"
+          INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CMD="tools/buildman/buildman --list-error-boards denx"
+          INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CMD="tools/buildman/buildman --list-error-boards freescale arm"
+          INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CMD="tools/buildman/buildman --list-error-boards siemens"
+          INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CMD="tools/buildman/buildman --list-error-boards ti"
+          INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CMD="tools/buildman/buildman mips"
           INSTALL_TOOLCHAIN="mips"
