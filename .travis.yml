@@ -92,7 +92,7 @@ matrix:
           INSTALL_TOOLCHAIN="mips"
           CROSS_COMPILE="/opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/mips-linux-"
     - env:
-        - TEST_CMD="tools/buildman/buildman --list-error-boards atmel"
+        - TEST_CMD="tools/buildman/buildman --list-error-boards atmel -x avr32"
           INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CMD="tools/buildman/buildman --list-error-boards denx"
