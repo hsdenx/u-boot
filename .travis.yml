@@ -2,7 +2,6 @@
 # SPDX-License-Identifier:	GPL-2.0+
 
 # build U-Boot on Travis CI - https://travis-ci.org/
-# do a change for triggering travis ...
 
 language: c
 
