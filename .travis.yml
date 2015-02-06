@@ -22,7 +22,7 @@ install:
  - echo -e "[toolchain]\\n${BUILDMAN_ROOT} /\n" > ~/.buildman
  - echo -e "${BUILDMAN_MIPS} /opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/" >> ~/.buildman
  - echo -e "${BUILDMAN_PPC} /opt/eldk-5.4/powerpc/sysroots/i686-eldk-linux/usr/bin/powerpc-linux/" >> ~/.buildman
- - echo -e "${BUILDMAN_ARM} /opt/eldk-5.4/arm5te/sysroots/i686-eldk-linux/usr/bin/arm5te-linux/" >> ~/.buildman
+ - echo -e "${BUILDMAN_ARM} /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi" >> ~/.buildman
  - export BUILDMAN_ALIAS="x86:"
  - echo -e "[toolchain-alias]\\n${BUILDMAN_ALIAS}  i386" >> ~/.buildman
  - cat ~/.buildman
