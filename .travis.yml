@@ -44,7 +44,6 @@ before_script:
   - if [[ "${INSTALL_TOOLCHAIN}" == *mips* ]]; then sh eldk-eglibc-i686-mips-toolchain-gmae-5.4.sh -y ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/armv5te/eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then sh eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh -y ; fi
-  - if [[ "${INSTALL_TOOLCHAIN_BM}" == *i386* ]]; then sh ./tools/buildman/buildman sandbox --fetch-arch i386; fi
 
 script:
  # the execution sequence for each test
@@ -134,8 +133,8 @@ matrix:
         - TEST_CMD="tools/buildman/buildman mpc86xx"
           INSTALL_TOOLCHAIN="ppc"
     - env:
-        - TEST_CMD="tools/buildman/buildman --list-error-boards sandbox x86"
-          INSTALL_TOOLCHAIN_BM="i386"
+        - TEST_CONFIG_CMD="tools/buildman/buildman sandbox --fetch-arch i386"
+          TEST_CMD="tools/buildman/buildman --list-error-boards sandbox x86"
 
     # QA jobs for code analytics
     # static code analysis with cppcheck (we can add --enable=all later)
