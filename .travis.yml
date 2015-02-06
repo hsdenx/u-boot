@@ -18,9 +18,11 @@ install:
  - export BUILDMAN_ROOT="root:"
  - export BUILDMAN_MIPS="mips:"
  - export BUILDMAN_PPC="ppc:"
+ - export BUILDMAN_ARM="arm:"
  - echo -e "[toolchain]\\n${BUILDMAN_ROOT} /\n" > ~/.buildman
  - echo -e "${BUILDMAN_MIPS} /opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/" >> ~/.buildman
  - echo -e "${BUILDMAN_PPC} /opt/eldk-5.4/powerpc/sysroots/i686-eldk-linux/usr/bin/powerpc-linux/" >> ~/.buildman
+ - echo -e "${BUILDMAN_ARM} /opt/eldk-5.4/arm5te/sysroots/i686-eldk-linux/usr/bin/arm5te-linux/" >> ~/.buildman
  - export BUILDMAN_ALIAS="x86:"
  - echo -e "[toolchain-alias]\\n${BUILDMAN_ALIAS}  i386" >> ~/.buildman
  - cat ~/.buildman
@@ -40,6 +42,8 @@ before_script:
   - if [[ "${INSTALL_TOOLCHAIN}" == *ppc* ]]; then sh eldk-eglibc-i686-powerpc-toolchain-gmae-5.4.sh -y ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *mips* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/mips/eldk-eglibc-i686-mips-toolchain-gmae-5.4.sh ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *mips* ]]; then sh eldk-eglibc-i686-mips-toolchain-gmae-5.4.sh -y ; fi
+  - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/armv5te/eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh ; fi
+  - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then sh eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh -y ; fi
 
 script:
  # the execution sequence for each test
@@ -54,19 +58,24 @@ matrix:
   # each env setting here is a dedicated build
     - env:
         - TEST_CMD="./MAKEALL -a arm -v atmel"
-          CROSS_COMPILE="arm-linux-gnueabi-"
+          INSTALL_TOOLCHAIN="arm"
+          CROSS_COMPILE="/opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/arm-linux-gnueabi-"
     - env:
         - TEST_CMD="./MAKEALL -a arm -v denx"
-          CROSS_COMPILE="arm-linux-gnueabi-"
+          INSTALL_TOOLCHAIN="arm"
+          CROSS_COMPILE="/opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/arm-linux-gnueabi-"
     - env:
         - TEST_CMD="./MAKEALL -a arm -v freescale"
-          CROSS_COMPILE="arm-linux-gnueabi-"
+          INSTALL_TOOLCHAIN="arm"
+          CROSS_COMPILE="/opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/arm-linux-gnueabi-"
     - env:
         - TEST_CMD="./MAKEALL -a arm -v siemens"
-          CROSS_COMPILE="arm-linux-gnueabi-"
+          INSTALL_TOOLCHAIN="arm"
+          CROSS_COMPILE="/opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/arm-linux-gnueabi-"
     - env:
         - TEST_CMD="./MAKEALL -a arm -v ti"
-          CROSS_COMPILE="arm-linux-gnueabi-"
+          INSTALL_TOOLCHAIN="arm"
+          CROSS_COMPILE="/opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/arm-linux-gnueabi-"
     - env:
         - TEST_CONFIG_CMD="make sandbox_defconfig"
           TEST_CMD="make -j4"
