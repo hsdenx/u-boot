@@ -19,6 +19,7 @@ install:
  - export BUILDMAN_MIPS="mips:"
  - export BUILDMAN_PPC="ppc:"
  - export BUILDMAN_ARM="arm:"
+ - export BUILDMAN_SANDBOX="sandbox:"
  - echo -e "[toolchain]\n${BUILDMAN_ROOT} /\n" > ~/.buildman
  - echo -e "${BUILDMAN_MIPS} /opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/\n" >> ~/.buildman
  - echo -e "${BUILDMAN_PPC} /opt/eldk-5.4/powerpc/sysroots/i686-eldk-linux/usr/bin/powerpc-linux/\n" >> ~/.buildman
@@ -50,6 +51,7 @@ before_script:
   - if [[ "${INSTALL_TOOLCHAIN}" == *mips* ]]; then sh eldk-eglibc-i686-mips-toolchain-gmae-5.4.sh -y ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/armv5te/eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then sh eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh -y ; fi
+  - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then ls -al /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi ; fi
 
 script:
  # the execution sequence for each test
@@ -101,7 +103,6 @@ matrix:
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
           TEST_CMD="tools/buildman/buildman --list-error-boards atmel -x avr32"
-          AFTER_TEST_CMD="ls -al /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi"
           INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
