@@ -123,6 +123,30 @@ matrix:
           INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
+          TEST_CMD="tools/buildman/buildman --list-error-boards arm1136"
+          INSTALL_TOOLCHAIN="arm"
+    - env:
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
+          TEST_CMD="tools/buildman/buildman --list-error-boards arm1176"
+          INSTALL_TOOLCHAIN="arm"
+    - env:
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
+          TEST_CMD="tools/buildman/buildman --list-error-boards arm720t"
+          INSTALL_TOOLCHAIN="arm"
+    - env:
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
+          TEST_CMD="tools/buildman/buildman --list-error-boards arm920t"
+          INSTALL_TOOLCHAIN="arm"
+    - env:
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
+          TEST_CMD="tools/buildman/buildman --list-error-boards davinci"
+          INSTALL_TOOLCHAIN="arm"
+    - env:
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
+          TEST_CMD="tools/buildman/buildman --list-error-boards kirkwood"
+          INSTALL_TOOLCHAIN="arm"
+    - env:
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
           TEST_CMD="tools/buildman/buildman mips"
           INSTALL_TOOLCHAIN="mips"
     - env:
