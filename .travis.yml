@@ -24,7 +24,6 @@ install:
  - echo -e "${BUILDMAN_MIPS} /opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/\n" >> ~/.buildman
  - echo -e "${BUILDMAN_PPC} /opt/eldk-5.4/powerpc/sysroots/i686-eldk-linux/usr/bin/powerpc-linux/\n" >> ~/.buildman
  - echo -e "${BUILDMAN_ARM} /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/\n" >> ~/.buildman
- - echo -e "${BUILDMAN_SANDBOX} /usr/bin/gcc\n" >> ~/.buildman
  - export BUILDMAN_ALIAS="x86"
  - export BUILDMAN_ALIAS_ARM="arm"
  - export BUILDMAN_ALIAS_SBOX="sandbox"
@@ -51,6 +50,7 @@ before_script:
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/armv5te/eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then sh eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh -y ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then ls -al /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi ; fi
+  - if [[ "${INSTALL_TOOLCHAIN}" == *i386* ]]; then ./tools/buildman/buildman sandbox --fetch-arch i386 ; fi
 
 script:
  # the execution sequence for each test
@@ -182,8 +182,9 @@ matrix:
           TEST_CMD="tools/buildman/buildman mpc86xx"
           INSTALL_TOOLCHAIN="ppc"
     - env:
-        - TEST_CONFIG_CMD="tools/buildman/buildman sandbox --fetch-arch i386"
+        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
           TEST_CMD="tools/buildman/buildman --list-error-boards sandbox x86"
+          INSTALL_TOOLCHAIN="i386"
 
     # QA jobs for code analytics
     # static code analysis with cppcheck (we can add --enable=all later)
