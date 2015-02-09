@@ -10,7 +10,7 @@ cache:
 
 install:
  # install U-Boot build dependencies
- - sudo apt-get install -qq cppcheck sloccount sparse bc libsdl-dev
+ - sudo apt-get install -qq cppcheck sloccount sparse bc libsdl-dev build-essential
  # install latest device tree compiler
  - git clone --depth=1 https://git.kernel.org/pub/scm/utils/dtc/dtc.git /tmp/dtc
  - make -j4 -C /tmp/dtc
@@ -24,12 +24,12 @@ install:
  - echo -e "${BUILDMAN_MIPS} /opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/\n" >> ~/.buildman
  - echo -e "${BUILDMAN_PPC} /opt/eldk-5.4/powerpc/sysroots/i686-eldk-linux/usr/bin/powerpc-linux/\n" >> ~/.buildman
  - echo -e "${BUILDMAN_ARM} /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi/\n" >> ~/.buildman
- - export BUILDMAN_ALIAS="x86"
- - export BUILDMAN_ALIAS_ARM="arm"
- - export BUILDMAN_ALIAS_SBOX="sandbox"
- - echo -e "\n\n[toolchain-alias]\n${BUILDMAN_ALIAS} = i386\n" >> ~/.buildman
- - echo -e "${BUILDMAN_ALIAS_SBOX} = i386\n" >> ~/.buildman
- - echo -e "${BUILDMAN_ALIAS_ARM} = armv5te\n" >> ~/.buildman
+ - export BUILDMAN_ALIAS="x86:"
+ - export BUILDMAN_ALIAS_ARM="arm:"
+ - export BUILDMAN_ALIAS_SBOX="sandbox:"
+ - echo -e "\n\n[toolchain-alias]\n${BUILDMAN_ALIAS} i386\n" >> ~/.buildman
+ - echo -e "${BUILDMAN_ALIAS_SBOX} i386\n" >> ~/.buildman
+ - echo -e "${BUILDMAN_ALIAS_ARM} armv5te\n" >> ~/.buildman
  - cat ~/.buildman
 
 env:
