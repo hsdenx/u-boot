@@ -41,7 +41,6 @@ env:
     - HOSTCC="cc"
     - HOSTCXX="c++"
     - TEST_CONFIG_CMD=""
-    - AFTER_TEST_CMD=""
 
 before_script:
   # install toolchains based on INSTALL_TOOLCHAIN} variable
@@ -59,8 +58,6 @@ script:
  - ${TEST_CONFIG_CMD}
  - echo ${TEST_CMD}
  - ${TEST_CMD}
- - echo ${AFTER_TEST_CMD}
- - ${AFTER_TEST_CMD}
 
 matrix:
   include:
