@@ -107,11 +107,11 @@ matrix:
           INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
-          TEST_CMD="tools/buildman/buildman --list-error-boards freescale -x powerpc,m68k"
+          TEST_CMD="tools/buildman/buildman --list-error-boards freescale -x powerpc,m68k,aarch64"
           INSTALL_TOOLCHAIN="arm"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
-          TEST_CMD="tools/buildman/buildman --list-error-boards freescale -x arm,m68k"
+          TEST_CMD="tools/buildman/buildman --list-error-boards freescale -x arm,m68k,aarch64"
           INSTALL_TOOLCHAIN="ppc"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
