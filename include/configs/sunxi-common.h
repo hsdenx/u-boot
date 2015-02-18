@@ -28,11 +28,7 @@
 #define CONFIG_SYS_TEXT_BASE		0x4a000000
 
 #if !defined(CONFIG_SPL_BUILD) && defined(CONFIG_DM)
-# define CONFIG_CMD_DM
-# define CONFIG_DM_GPIO
-# define CONFIG_DM_SERIAL
 # define CONFIG_DW_SERIAL
-# define CONFIG_SYS_MALLOC_F_LEN	(1 << 10)
 #endif
 
 /*
@@ -84,6 +80,9 @@
 
 #define CONFIG_CMD_MEMORY
 #define CONFIG_CMD_SETEXPR
+
+#define CONFIG_PARTITION_UUIDS
+#define CONFIG_CMD_PART
 
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_CMDLINE_TAG
