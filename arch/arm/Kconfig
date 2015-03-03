@@ -73,10 +73,6 @@ config TARGET_INTEGRATORCP_CM920T
 	bool "Support integratorcp_cm920t"
 	select CPU_ARM920T
 
-config TARGET_A320EVB
-	bool "Support a320evb"
-	select CPU_ARM920T
-
 config ARCH_AT91
 	bool "Atmel AT91"
 
@@ -86,14 +82,6 @@ config TARGET_EDB93XX
 
 config TARGET_SCB9328
 	bool "Support scb9328"
-	select CPU_ARM920T
-
-config TARGET_CM4008
-	bool "Support cm4008"
-	select CPU_ARM920T
-
-config TARGET_CM41XX
-	bool "Support cm41xx"
 	select CPU_ARM920T
 
 config TARGET_VCMA9
@@ -142,10 +130,6 @@ config TARGET_MAXBCM
 
 config TARGET_DEVKIT3250
 	bool "Support devkit3250"
-	select CPU_ARM926EJS
-
-config TARGET_JADECPU
-	bool "Support jadecpu"
 	select CPU_ARM926EJS
 
 config TARGET_MX25PDK
@@ -225,10 +209,6 @@ config ARCH_NOMADIK
 
 config ORION5X
 	bool "Marvell Orion"
-	select CPU_ARM926EJS
-
-config TARGET_DKB
-	bool "Support dkb"
 	select CPU_ARM926EJS
 
 config TARGET_SPEAR300
@@ -313,10 +293,6 @@ config TARGET_RPI
 config TARGET_RPI_2
 	bool "Support rpi_2"
 	select CPU_V7
-
-config TARGET_TNETV107X_EVM
-	bool "Support tnetv107x_evm"
-	select CPU_ARM1176
 
 config TARGET_INTEGRATORAP_CM946ES
 	bool "Support integratorap_cm946es"
@@ -616,13 +592,16 @@ config ZYNQ
 	select CPU_V7
 	select SUPPORT_SPL
 
+config TARGET_XILINX_ZYNQMP
+	bool "Support Xilinx ZynqMP Platform"
+	select ARM64
+
 config TEGRA
 	bool "NVIDIA Tegra"
 	select SUPPORT_SPL
 	select SPL
-	select OF_CONTROL if !SPL_BUILD
-	select CPU_ARM720T if SPL_BUILD
-	select CPU_V7 if !SPL_BUILD
+	select OF_CONTROL
+	select CPU_V7
 
 config TARGET_VEXPRESS64_AEMV8A
 	bool "Support vexpress_aemv8a"
@@ -714,7 +693,7 @@ config ARCH_UNIPHIER
 	select CPU_V7
 	select SUPPORT_SPL
 	select SPL
-	select OF_CONTROL if !SPL_BUILD
+	select OF_CONTROL
 
 endchoice
 
@@ -748,7 +727,7 @@ source "arch/arm/cpu/armv7/s5pc1xx/Kconfig"
 
 source "arch/arm/mach-tegra/Kconfig"
 
-source "arch/arm/cpu/armv7/uniphier/Kconfig"
+source "arch/arm/mach-uniphier/Kconfig"
 
 source "arch/arm/mach-versatile/Kconfig"
 
@@ -762,7 +741,6 @@ source "board/BuR/tseries/Kconfig"
 source "board/CarMediaLab/flea3/Kconfig"
 source "board/Marvell/aspenite/Kconfig"
 source "board/Marvell/db-mv784mp-gp/Kconfig"
-source "board/Marvell/dkb/Kconfig"
 source "board/Marvell/gplugd/Kconfig"
 source "board/altera/socfpga/Kconfig"
 source "board/armadeus/apf27/Kconfig"
@@ -779,8 +757,6 @@ source "board/broadcom/bcm28155_ap/Kconfig"
 source "board/broadcom/bcmcygnus/Kconfig"
 source "board/broadcom/bcmnsp/Kconfig"
 source "board/cirrus/edb93xx/Kconfig"
-source "board/cm4008/Kconfig"
-source "board/cm41xx/Kconfig"
 source "board/compulab/cm_t335/Kconfig"
 source "board/compulab/cm_fx6/Kconfig"
 source "board/congatec/cgtqmx6eval/Kconfig"
@@ -790,7 +766,6 @@ source "board/denx/m28evk/Kconfig"
 source "board/denx/m53evk/Kconfig"
 source "board/embest/mx6boards/Kconfig"
 source "board/esg/ima3-mx53/Kconfig"
-source "board/faraday/a320evb/Kconfig"
 source "board/freescale/ls2085a/Kconfig"
 source "board/freescale/ls1021aqds/Kconfig"
 source "board/freescale/ls1021atwr/Kconfig"
@@ -853,14 +828,12 @@ source "board/st-ericsson/snowball/Kconfig"
 source "board/st-ericsson/u8500/Kconfig"
 source "board/st/stv0991/Kconfig"
 source "board/sunxi/Kconfig"
-source "board/syteco/jadecpu/Kconfig"
 source "board/syteco/zmx25/Kconfig"
 source "board/tbs/tbs2910/Kconfig"
 source "board/ti/am335x/Kconfig"
 source "board/ti/am43xx/Kconfig"
 source "board/ti/ti814x/Kconfig"
 source "board/ti/ti816x/Kconfig"
-source "board/ti/tnetv107xevm/Kconfig"
 source "board/timll/devkit3250/Kconfig"
 source "board/toradex/colibri_pxa270/Kconfig"
 source "board/tqc/tqma6/Kconfig"
@@ -871,6 +844,7 @@ source "board/vpac270/Kconfig"
 source "board/wandboard/Kconfig"
 source "board/woodburn/Kconfig"
 source "board/xaeniax/Kconfig"
+source "board/xilinx/zynqmp/Kconfig"
 source "board/zipitz2/Kconfig"
 
 source "arch/arm/Kconfig.debug"
