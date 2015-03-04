@@ -17,4 +17,4 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-obj-y	+= smartweb_hw.o
+obj-y	+= smartweb.o
