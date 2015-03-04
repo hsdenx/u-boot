@@ -200,10 +200,11 @@ class Toolchains:
         fnames = []
         for subdir in ['.', 'bin', 'usr/bin']:
             dirname = os.path.join(path, subdir)
-            if verbose: print "      - looking in '%s'" % dirname
-            for fname in glob.glob(dirname + '/*gcc'):
-                if verbose: print "         - found '%s'" % fname
-                fnames.append(fname)
+            if os.path.exists(dirname):
+                if verbose: print "      - looking in '%s'" % dirname
+                for fname in glob.glob(dirname + '/*gcc'):
+                    if verbose: print "         - found '%s'" % fname
+                    fnames.append(fname)
         return fnames
 
 
@@ -469,7 +470,7 @@ class Toolchains:
         if not compiler_fname:
             print 'Could not locate C compiler - fetch failed.'
             return 1
-        toolchain = Toolchain(compiler_fname, True, True)
+        toolchain = Toolchain(compiler_fname[0], True, True)
 
         # Make sure that it will be found by buildman
         if not self.TestSettingsHasPath(dirpath):
