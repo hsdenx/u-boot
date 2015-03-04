@@ -34,7 +34,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-static void smartweb_hw_nand_hw_init(void)
+static void smartweb_nand_hw_init(void)
 {
 	struct at91_smc *smc = (struct at91_smc *)ATMEL_BASE_SMC;
 	struct at91_matrix *matrix = (struct at91_matrix *)ATMEL_BASE_MATRIX;
@@ -66,7 +66,7 @@ static void smartweb_hw_nand_hw_init(void)
 }
 
 #ifdef CONFIG_MACB
-static void smartweb_hw_macb_hw_init(void)
+static void smartweb_macb_hw_init(void)
 {
 	struct at91_port *pioa = (struct at91_port *)ATMEL_BASE_PIOA;
 
@@ -120,9 +120,9 @@ int board_init(void)
 	/* Adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
-	smartweb_hw_nand_hw_init();
+	smartweb_nand_hw_init();
 #ifdef CONFIG_MACB
-	smartweb_hw_macb_hw_init();
+	smartweb_macb_hw_init();
 #endif
 	return 0;
 }
@@ -158,7 +158,7 @@ void matrix_init(void)
 
 void at91_spl_board_init(void)
 {
-	smartweb_hw_nand_hw_init();
+	smartweb_nand_hw_init();
 	at91_set_gpio_input(AT91_PIN_PA31, 1);
 
 	/* check if both  button is pressed */

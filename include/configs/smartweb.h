@@ -15,7 +15,7 @@
  * Heiko Schocher <hs@denx.de>
  * DENX Software Engineering GmbH
  *
- * Configuation settings for the smartweb_hw.
+ * Configuation settings for the smartweb.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
