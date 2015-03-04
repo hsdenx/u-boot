@@ -130,8 +130,8 @@ config TARGET_TAURUS
 	select CPU_ARM926EJS
 	select SUPPORT_SPL
 
-config TARGET_SMARTWEB_HW
-	bool "Support smartweb_hw"
+config TARGET_SMARTWEB
+	bool "Support smartweb"
 	select CPU_ARM926EJS
 	select SUPPORT_SPL
 
@@ -169,7 +169,7 @@ source "board/ronetix/pm9263/Kconfig"
 source "board/ronetix/pm9g45/Kconfig"
 source "board/siemens/corvus/Kconfig"
 source "board/siemens/taurus/Kconfig"
-source "board/siemens/smartweb_hw/Kconfig"
+source "board/siemens/smartweb/Kconfig"
 source "board/taskit/stamp9g20/Kconfig"
 
 endif
