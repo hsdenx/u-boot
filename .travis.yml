@@ -42,7 +42,6 @@ env:
 
 before_script:
   # install toolchains based on INSTALL_TOOLCHAIN} variable
-  - if [[ "${INSTALL_TOOLCHAIN}" == *arc* ]]; then ./tools/buildman/buildman --fetch-arch arc ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/armv5te/eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then sh eldk-eglibc-i686-arm-toolchain-gmae-5.4.sh -y ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *arm* ]]; then ls -al /opt/eldk-5.4/armv5te/sysroots/i686-eldk-linux/usr/bin/armv5te-linux-gnueabi ; fi
@@ -100,10 +99,6 @@ matrix:
         - TEST_CMD="./MAKEALL -a mips"
           INSTALL_TOOLCHAIN="mips"
           CROSS_COMPILE="/opt/eldk-5.4/mips/sysroots/i686-eldk-linux/usr/bin/mips32-linux/mips-linux-"
-    - env:
-        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
-          TEST_CMD="tools/buildman/buildman --list-error-boards arc"
-          INSTALL_TOOLCHAIN="arc"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
           TEST_CMD="tools/buildman/buildman --list-error-boards arm1136"
