@@ -52,7 +52,6 @@ before_script:
   - if [[ "${INSTALL_TOOLCHAIN}" == *mips* ]]; then sh eldk-eglibc-i686-mips-toolchain-gmae-5.4.sh -y ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *ppc* ]]; then wget ftp://ftp.denx.de/pub/eldk/5.4/targets/powerpc/eldk-eglibc-i686-powerpc-toolchain-gmae-5.4.sh ; fi
   - if [[ "${INSTALL_TOOLCHAIN}" == *ppc* ]]; then sh eldk-eglibc-i686-powerpc-toolchain-gmae-5.4.sh -y ; fi
-  - if [[ "${INSTALL_TOOLCHAIN}" == *sh4* ]]; then ./tools/buildman/buildman --fetch-arch sh4 ; fi
 
 script:
  # the execution sequence for each test
@@ -187,10 +186,6 @@ matrix:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
           TEST_CMD="tools/buildman/buildman mpc8xx"
           INSTALL_TOOLCHAIN="ppc"
-    - env:
-        - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
-          TEST_CMD="tools/buildman/buildman --list-error-boards sh4"
-          INSTALL_TOOLCHAIN="sh4"
     - env:
         - TEST_CONFIG_CMD="tools/buildman/buildman --list-tool-chains"
           TEST_CMD="tools/buildman/buildman --list-error-boards siemens"
