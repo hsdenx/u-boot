@@ -120,7 +120,32 @@
 #define CONFIG_DOS_PARTITION
 #define CONFIG_USB_STORAGE
 
-#define CONFIG_SYS_LOAD_ADDR		0x72000000	/* load address */
+/* USB DFU support */
+#define CONFIG_CMD_MTDPARTS
+#define CONFIG_MTD_DEVICE
+#define CONFIG_MTD_PARTITIONS
+
+#define CONFIG_USB_GADGET
+#define CONFIG_USB_GADGET_DUALSPEED
+#define CONFIG_USB_GADGET_ATMEL_USBA
+
+/* DFU class support */
+#define CONFIG_CMD_DFU
+#define CONFIG_DFU_FUNCTION
+#define CONFIG_DFU_NAND
+#define CONFIG_USBDOWNLOAD_GADGET
+#define CONFIG_USB_GADGET_VBUS_DRAW	2
+#define CONFIG_SYS_DFU_DATA_BUF_SIZE	(1 << 20)
+#define DFU_MANIFEST_POLL_TIMEOUT	25000
+
+/* USB DFU IDs */
+#define CONFIG_G_DNL_VENDOR_NUM 0x0908
+#define CONFIG_G_DNL_PRODUCT_NUM 0x02d2
+#define CONFIG_G_DNL_MANUFACTURER "Siemens AG"
+
+#define CONFIG_SYS_CACHELINE_SIZE	0x2000
+/* fuer was das ? */
+#define CONFIG_SYS_LOAD_ADDR	ATMEL_BASE_CS6
 
 /* bootstrap + u-boot + env in nandflash */
 #define CONFIG_ENV_IS_IN_NAND
@@ -154,7 +179,7 @@
  * Size of malloc() pool
  */
 #define CONFIG_SYS_MALLOC_LEN	ROUND(3 * CONFIG_ENV_SIZE + \
-				128*1024, 0x1000)
+				4*1024*1024, 0x1000)
 /* Defines for SPL */
 #define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_TEXT_BASE		0x300000

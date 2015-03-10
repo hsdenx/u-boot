@@ -27,6 +27,15 @@ static int vbus_is_present(struct usba_udc *udc)
 	return 1;
 }
 
+static int print_register(struct usba_udc *udc)
+{
+printf("%s: **************** CTRL: %lx\n", __func__, usba_readl(udc, CTRL));
+printf("%s: **************** FNUM: %lx\n", __func__, usba_readl(udc, FNUM));
+printf("%s: **************** INT_ENB: %lx\n", __func__, usba_readl(udc, INT_ENB));
+printf("%s: **************** INT_STA: %lx\n", __func__, usba_readl(udc, INT_STA));
+	return 0;
+}
+
 static void next_fifo_transaction(struct usba_ep *ep, struct usba_request *req)
 {
 	unsigned int transaction_len;
@@ -1072,7 +1081,8 @@ static int usba_udc_irq(struct usba_udc *udc)
 	spin_lock(&udc->lock);
 
 	status = usba_readl(udc, INT_STA);
-	DBG(DBG_INT, "irq, status=%#08x\n", status);
+	if (status)
+		DBG(DBG_INT, "irq, status=%#08x\n", status);
 
 	if (status & USBA_DET_SUSPEND) {
 		usba_writel(udc, INT_CLR, USBA_DET_SUSPEND);
@@ -1167,12 +1177,14 @@ static int atmel_usba_start(struct usba_udc *udc)
 
 	udc->vbus_prev = 0;
 
+printf("%s: **************** vbus_is_present(udc): %d %d == 0\n", __func__, vbus_is_present(udc), udc->vbus_prev);
 	/* If Vbus is present, enable the controller and wait for reset */
 	if (vbus_is_present(udc) && udc->vbus_prev == 0) {
 		usba_writel(udc, CTRL, USBA_ENABLE_MASK);
 		usba_writel(udc, INT_ENB, USBA_END_OF_RESET);
 	}
 
+	print_register(udc);
 	return 0;
 }
 
@@ -1181,6 +1193,7 @@ static int atmel_usba_stop(struct usba_udc *udc)
 	udc->gadget.speed = USB_SPEED_UNKNOWN;
 	reset_all_endpoints(udc);
 
+printf("%s: **************** \n", __func__);
 	/* This will also disable the DP pullup */
 	usba_writel(udc, CTRL, USBA_DISABLE_MASK);
 
