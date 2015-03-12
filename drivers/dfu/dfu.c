@@ -17,6 +17,9 @@
 #include <linux/list.h>
 #include <linux/compiler.h>
 
+#undef debug
+#define debug(fmt,arg...) printf("%s: " fmt,__func__, ##arg)
+
 static LIST_HEAD(dfu_list);
 static int dfu_alt_num;
 static int alt_num_cnt;
