@@ -56,6 +56,7 @@ static int ep_matches(
 	const char	*tmp;
 	u16		max;
 
+printf("%s: *****************\n", __func__);
 	/* endpoint already claimed? */
 	if (NULL != ep->driver_data)
 		return 0;
@@ -178,6 +179,7 @@ find_ep(struct usb_gadget *gadget, const char *name)
 {
 	struct usb_ep	*ep;
 
+printf("%s: *****************\n", __func__);
 	list_for_each_entry(ep, &gadget->ep_list, ep_list) {
 		if (0 == strcmp(ep->name, name))
 			return ep;
@@ -223,6 +225,7 @@ struct usb_ep *usb_ep_autoconfig(
 	struct usb_ep	*ep = NULL;
 	u8		type;
 
+printf("%s: *****************\n", __func__);
 	type = desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK;
 
 	/* First, apply chip-specific "best usage" knowledge.
@@ -308,6 +311,7 @@ void usb_ep_autoconfig_reset(struct usb_gadget *gadget)
 {
 	struct usb_ep	*ep;
 
+printf("%s: *****************\n", __func__);
 	list_for_each_entry(ep, &gadget->ep_list, ep_list) {
 		ep->driver_data = NULL;
 	}

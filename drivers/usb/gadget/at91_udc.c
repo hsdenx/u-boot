@@ -11,8 +11,8 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#undef	VERBOSE_DEBUG
-#undef	PACKET_TRACE
+#define	VERBOSE_DEBUG
+#define	PACKET_TRACE
 
 #if 0
 #include <linux/kernel.h>
@@ -60,6 +60,9 @@
 #include <malloc.h>
 #include <usb/lin_gadget_compat.h>
 #endif
+
+#undef debug
+#define debug(fmt,arg...) printf("%s: " fmt,__func__, ##arg)
 
 #include "at91_udc.h"
 
@@ -268,6 +271,19 @@ static inline void remove_debug_file(struct at91_udc *udc) {}
 
 #endif
 
+static void print_register(char *name, struct usb_gadget *gadget)
+{
+	struct at91_udc	*udc = to_udc(gadget);
+
+	printf("%s\n", name);
+	printf("AT91_UDP_GLB_STAT@%lx: %lx = AT91_UDP_ESR: %lx\n", AT91_UDP_GLB_STAT, at91_udp_read(udc, AT91_UDP_GLB_STAT), AT91_UDP_ESR);
+	printf("AT91_UDP_TXVC@%lx    : %lx = AT91_UDP_TXVC_PUON %lx\n", AT91_UDP_TXVC, at91_udp_read(udc, AT91_UDP_TXVC), AT91_UDP_TXVC_PUON);
+	printf("AT91_UDP_IDR@%lx: %lx\n", AT91_UDP_IDR, at91_udp_read(udc, AT91_UDP_IDR));
+	printf("AT91_UDP_IER@%lx: %lx\n", AT91_UDP_IER, at91_udp_read(udc, AT91_UDP_IER));
+	printf("AT91_UDP_IMR@%lx: %lx\n", AT91_UDP_IMR, at91_udp_read(udc, AT91_UDP_IMR));
+	printf("AT91_UDP_ISR@%lx: %lx\n", AT91_UDP_ISR, at91_udp_read(udc, AT91_UDP_ISR));
+	printf("udc->clocked: %d udc->suspended: %d\n", udc->clocked, udc->suspended);
+}
 
 /*-------------------------------------------------------------------------*/
 
@@ -276,6 +292,7 @@ static void done(struct at91_ep *ep, struct at91_request *req, int status)
 	unsigned	stopped = ep->stopped;
 	struct at91_udc	*udc = ep->udc;
 
+printf("%s: *************++\n", __func__);
 	list_del_init(&req->queue);
 	if (req->req.status == -EINPROGRESS)
 		req->req.status = status;
@@ -337,6 +354,7 @@ static int read_fifo (struct at91_ep *ep, struct at91_request *req)
 	buf = req->req.buf + req->req.actual;
 	bufferspace = req->req.length - req->req.actual;
 
+printf("%s: *************++\n", __func__);
 	/*
 	 * there might be nothing to read if ep_queue() calls us,
 	 * or if we already emptied both pingpong buffers
@@ -410,6 +428,7 @@ static int write_fifo(struct at91_ep *ep, struct at91_request *req)
 	unsigned	total, count, is_last;
 	u8		*buf;
 
+printf("%s: *************++\n", __func__);
 	/*
 	 * TODO: allow for writing two packets to the fifo ... that'll
 	 * reduce the amount of IN-NAKing, but probably won't affect
@@ -475,6 +494,7 @@ static void nuke(struct at91_ep *ep, int status)
 {
 	struct at91_request *req;
 
+printf("%s: *************++\n", __func__);
 	/* terminate any request in the queue */
 	ep->stopped = 1;
 	if (list_empty(&ep->queue))
@@ -498,6 +518,7 @@ static int at91_ep_enable(struct usb_ep *_ep,
 	u32		tmp;
 	unsigned long	flags;
 
+printf("%s: *************++\n", __func__);
 	if (!_ep || !ep
 			|| !desc || _ep->name == ep0name
 			|| desc->bDescriptorType != USB_DT_ENDPOINT
@@ -573,6 +594,7 @@ static int at91_ep_disable (struct usb_ep * _ep)
 	struct at91_udc	*udc = ep->udc;
 	unsigned long	flags;
 
+printf("%s: *************++\n", __func__);
 	if (ep == &ep->udc->ep[0])
 		return -EINVAL;
 
@@ -607,6 +629,7 @@ at91_ep_alloc_request(struct usb_ep *_ep, gfp_t gfp_flags)
 {
 	struct at91_request *req;
 
+printf("%s: *************++\n", __func__);
 	req = kzalloc(sizeof (struct at91_request), gfp_flags);
 	if (!req)
 		return NULL;
@@ -619,6 +642,7 @@ static void at91_ep_free_request(struct usb_ep *_ep, struct usb_request *_req)
 {
 	struct at91_request *req;
 
+printf("%s: *************++\n", __func__);
 	req = container_of(_req, struct at91_request, req);
 	BUG_ON(!list_empty(&req->queue));
 	kfree(req);
@@ -633,6 +657,7 @@ static int at91_ep_queue(struct usb_ep *_ep,
 	int			status;
 	unsigned long		flags;
 
+printf("%s: *************++\n", __func__);
 	req = container_of(_req, struct at91_request, req);
 	ep = container_of(_ep, struct at91_ep, ep);
 
@@ -737,6 +762,7 @@ static int at91_ep_dequeue(struct usb_ep *_ep, struct usb_request *_req)
 	struct at91_udc		*udc;
 #endif
 
+printf("%s: *************++\n", __func__);
 	ep = container_of(_ep, struct at91_ep, ep);
 	if (!_ep || ep->ep.name == ep0name)
 		return -EINVAL;
@@ -771,6 +797,7 @@ static int at91_ep_set_halt(struct usb_ep *_ep, int value)
 	unsigned long	flags;
 	int		status = 0;
 
+printf("%s: *************++\n", __func__);
 	if (!_ep || ep->is_iso || !ep->udc->clocked)
 		return -EINVAL;
 
@@ -821,6 +848,7 @@ static int at91_get_frame(struct usb_gadget *gadget)
 {
 	struct at91_udc *udc = to_udc(gadget);
 
+printf("%s: *************++\n", __func__);
 	if (!to_udc(gadget)->clocked)
 		return -EINVAL;
 	return at91_udp_read(udc, AT91_UDP_FRM_NUM) & AT91_UDP_NUM;
@@ -833,6 +861,7 @@ static int at91_wakeup(struct usb_gadget *gadget)
 	int		status = -EINVAL;
 	unsigned long	flags;
 
+printf("%s: ************* udc->clocked: %d udc->suspended: %d\n", __func__, udc->clocked, udc->suspended);
 	DBG("%s\n", __func__ );
 	spin_lock_irqsave(&udc->lock, flags);
 
@@ -860,6 +889,7 @@ static void udc_reinit(struct at91_udc *udc)
 	INIT_LIST_HEAD(&udc->gadget.ep_list);
 	INIT_LIST_HEAD(&udc->gadget.ep0->ep_list);
 
+printf("%s: *************++\n", __func__);
 	for (i = 0; i < NUM_ENDPOINTS; i++) {
 		struct at91_ep *ep = &udc->ep[i];
 
@@ -885,6 +915,7 @@ static void reset_gadget(struct at91_udc *udc)
 	struct usb_gadget_driver *driver = udc->driver;
 	int i;
 
+printf("%s: *************++\n", __func__);
 	if (udc->gadget.speed == USB_SPEED_UNKNOWN)
 		driver = NULL;
 	udc->gadget.speed = USB_SPEED_UNKNOWN;
@@ -914,6 +945,7 @@ static void stop_activity(struct at91_udc *udc)
 	struct usb_gadget_driver *driver = udc->driver;
 	int i;
 
+printf("%s: *************++\n", __func__);
 	if (udc->gadget.speed == USB_SPEED_UNKNOWN)
 		driver = NULL;
 	udc->gadget.speed = USB_SPEED_UNKNOWN;
@@ -993,6 +1025,7 @@ static void pullup(struct at91_udc *udc, int is_on)
 {
 	int	active = !udc->board.pullup_active_low;
 
+printf("%s: **************** is_on : %d\n", __func__, is_on);
 	if (!udc->enabled || !udc->vbus)
 		is_on = 0;
 	DBG("%sactive\n", is_on ? "" : "in");
@@ -1043,6 +1076,7 @@ static void pullup(struct at91_udc *udc, int is_on)
 		}
 		clk_off(udc);
 	}
+	print_register("pullup", udc);
 }
 
 #ifndef __UBOOT__
@@ -1069,6 +1103,7 @@ static int at91_pullup(struct usb_gadget *gadget, int is_on)
 	struct at91_udc	*udc = to_udc(gadget);
 	unsigned long	flags;
 
+printf("%s: **************** is_on: %d\n", __func__, is_on);
 	spin_lock_irqsave(&udc->lock, flags);
 	udc->enabled = is_on = !!is_on;
 	pullup(udc, is_on);
@@ -1546,6 +1581,7 @@ static irqreturn_t at91_udc_irq (struct at91_udc *udc)
 		if (!status)
 			break;
 
+printf("%s: status: %x\n", __func__, status);
 		/* USB reset irq:  not maskable */
 		if (status & AT91_UDP_ENDBUSRES) {
 			at91_udp_write(udc, AT91_UDP_IDR, ~MINIMUS_INTERRUPTUS);
@@ -1761,6 +1797,7 @@ static int at91_start(struct at91_udc *udc)
 {
 	udc->enabled = 1;
 	udc->selfpowered = 1;
+printf("%s: ****************\n", __func__);
 
 	return 0;
 }
@@ -1779,6 +1816,7 @@ static int at91_stop(struct at91_udc *udc)
 #else
 	unsigned long	flags;
 #endif
+printf("%s: ****************\n", __func__);
 	spin_lock_irqsave(&udc->lock, flags);
 	udc->enabled = 0;
 	at91_udp_write(udc, AT91_UDP_IDR, ~0);
@@ -1830,6 +1868,7 @@ static int at91udc_probe(struct platform_device *pdev)
 	int		retval;
 	struct resource	*res;
 
+printf("%s: ****************\n", __func__);
 	if (!dev_get_platdata(dev) && !pdev->dev.of_node) {
 		/* small (so we copy it) but critical! */
 		DBG("missing platform_data\n");
@@ -2192,6 +2231,7 @@ int at91_udc_probe(struct at91_udc_data *pdata)
 	struct at91_udc *udc;
 	int retval;
 
+printf("%s: ****************\n", __func__);
 	udc = &controller;
 	memcpy(&udc->board, pdata, sizeof(struct at91_udc_data));
 	udc->enabled = 0;
@@ -2209,6 +2249,7 @@ int at91_udc_probe(struct at91_udc_data *pdata)
 
 	/* newer chips have more FIFO memory than rm9200 */
 	if (cpu_is_at91sam9260() || cpu_is_at91sam9g20()) {
+printf("%s: **************** is g20\n", __func__);
 		udc->ep[0].maxpacket = 64;
 		udc->ep[3].maxpacket = 64;
 		udc->ep[4].maxpacket = 512;

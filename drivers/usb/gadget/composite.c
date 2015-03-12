@@ -8,6 +8,9 @@
  */
 #undef DEBUG
 
+#undef debug
+#define debug printf
+
 #include <linux/bitops.h>
 #include <linux/usb/composite.h>
 
