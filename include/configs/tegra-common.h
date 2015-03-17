@@ -36,7 +36,12 @@
 /*
  * Size of malloc() pool
  */
+#ifdef CONFIG_DFU_MMC
+#define CONFIG_SYS_MALLOC_LEN		((4 << 20) + \
+					CONFIG_SYS_DFU_DATA_BUF_SIZE)
+#else
 #define CONFIG_SYS_MALLOC_LEN		(4 << 20)	/* 4MB  */
+#endif
 
 #define CONFIG_SYS_NONCACHED_MEMORY	(1 << 20)       /* 1 MiB */
 
@@ -145,6 +150,8 @@
 #define CONFIG_SPL_GPIO_SUPPORT
 
 #define CONFIG_SYS_GENERIC_BOARD
+#define CONFIG_BOARD_EARLY_INIT_F
+#define CONFIG_BOARD_LATE_INIT
 
 /* Misc utility code */
 #define CONFIG_BOUNCE_BUFFER

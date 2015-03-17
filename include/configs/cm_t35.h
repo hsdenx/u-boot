@@ -26,11 +26,15 @@
 #define CONFIG_CM_T3X	/* working with CM-T35 and CM-T3730 */
 #define CONFIG_OMAP_COMMON
 #define CONFIG_SYS_GENERIC_BOARD
+/* Common ARM Erratas */
+#define CONFIG_ARM_ERRATA_454179
+#define CONFIG_ARM_ERRATA_430973
+#define CONFIG_ARM_ERRATA_621766
 
 #define CONFIG_SDRC	/* The chip has SDRC controller */
 
 #include <asm/arch/cpu.h>		/* get chip and board defs */
-#include <asm/arch/omap3.h>
+#include <asm/arch/omap.h>
 
 /*
  * Display CPU and Board information

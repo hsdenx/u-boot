@@ -21,13 +21,17 @@
 #define CONFIG_OMAP_GPIO
 #define CONFIG_OMAP_COMMON
 #define CONFIG_SYS_GENERIC_BOARD
+/* Common ARM Erratas */
+#define CONFIG_ARM_ERRATA_454179
+#define CONFIG_ARM_ERRATA_430973
+#define CONFIG_ARM_ERRATA_621766
 
 #define MACH_TYPE_OMAP3_TAO3530		2836
 
 #define CONFIG_SDRC			/* Has an SDRC controller */
 
 #include <asm/arch/cpu.h>		/* get chip and board defs */
-#include <asm/arch/omap3.h>
+#include <asm/arch/omap.h>
 
 /*
  * Display CPU and Board information
