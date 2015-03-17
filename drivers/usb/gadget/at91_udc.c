@@ -271,9 +271,9 @@ static inline void remove_debug_file(struct at91_udc *udc) {}
 
 #endif
 
-static void print_register(char *name, struct usb_gadget *gadget)
+static void print_register(char *name, struct at91_udc *udc)
 {
-	struct at91_udc	*udc = to_udc(gadget);
+//	struct at91_udc	*udc = to_udc(gadget);
 
 	printf("%s\n", name);
 	printf("AT91_UDP_GLB_STAT@%lx: %lx = AT91_UDP_ESR: %lx\n", AT91_UDP_GLB_STAT, at91_udp_read(udc, AT91_UDP_GLB_STAT), AT91_UDP_ESR);
