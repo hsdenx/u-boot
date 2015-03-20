@@ -115,6 +115,7 @@ int usb_function_activate(struct usb_function *function)
 	struct usb_composite_dev	*cdev = function->config->cdev;
 	int				status = 0;
 
+printf("%s: **************+\n", __func__);
 	if (cdev->deactivations == 0)
 		status = -EINVAL;
 	else {
@@ -154,6 +155,7 @@ int usb_interface_id(struct usb_configuration *config,
 {
 	unsigned char id = config->next_interface_id;
 
+printf("%s: **************\n", __func__);
 	if (id < MAX_CONFIG_INTERFACES) {
 		config->interface[id] = function;
 		config->next_interface_id = id + 1;
@@ -172,6 +174,9 @@ static int config_buf(struct usb_configuration *config,
 	int				status;
 	struct usb_function		*f;
 
+printf("%s: ************** USB_DT_CONFIG_SIZE: %d type: %d\n", __func__, USB_DT_CONFIG_SIZE, type);
+printf("%s: config->next_interface_id: %d config->bConfigurationValue: %d\n", __func__, config->next_interface_id, config->bConfigurationValue);
+printf("%s: USB_CONFIG_ATT_ONE | config->bmAttributes: %d maxPower: %d\n", __func__, USB_CONFIG_ATT_ONE | config->bmAttributes, config->bMaxPower ? : (CONFIG_USB_GADGET_VBUS_DRAW / 2));
 	/* write the config descriptor */
 	c = buf;
 	c->bLength = USB_DT_CONFIG_SIZE;

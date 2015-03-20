@@ -27,6 +27,9 @@
 #include <g_dnl.h>
 #include "f_dfu.h"
 
+#undef debug
+#define debug printf
+
 struct f_dfu {
 	struct usb_function		usb_function;
 

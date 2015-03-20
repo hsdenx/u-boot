@@ -31,13 +31,13 @@
 #define usberr(fmt,args...) do{}while(0)
 #endif
 
-#if 0
+#if 1
 #define usbdbg(fmt,args...) serial_printf("debug: %s(), %d: "fmt"\n",__FUNCTION__,__LINE__,##args)
 #else
 #define usbdbg(fmt,args...) do{}while(0)
 #endif
 
-#if 0
+#if 1
 #define usbinfo(fmt,args...) serial_printf("info: %s(), %d: "fmt"\n",__FUNCTION__,__LINE__,##args)
 #else
 #define usbinfo(fmt,args...) do{}while(0)

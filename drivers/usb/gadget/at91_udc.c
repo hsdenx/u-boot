@@ -274,6 +274,7 @@ static inline void remove_debug_file(struct at91_udc *udc) {}
 static void print_register(char *name, struct at91_udc *udc)
 {
 //	struct at91_udc	*udc = to_udc(gadget);
+	int i;
 
 	printf("%s\n", name);
 	printf("AT91_UDP_GLB_STAT@%lx: %lx = AT91_UDP_ESR: %lx\n", AT91_UDP_GLB_STAT, at91_udp_read(udc, AT91_UDP_GLB_STAT), AT91_UDP_ESR);
@@ -283,6 +284,9 @@ static void print_register(char *name, struct at91_udc *udc)
 	printf("AT91_UDP_IMR@%lx: %lx\n", AT91_UDP_IMR, at91_udp_read(udc, AT91_UDP_IMR));
 	printf("AT91_UDP_ISR@%lx: %lx\n", AT91_UDP_ISR, at91_udp_read(udc, AT91_UDP_ISR));
 	printf("udc->clocked: %d udc->suspended: %d\n", udc->clocked, udc->suspended);
+	for (i = 0; i < 6; i++) {
+		printf("AT91_UDP_CSR(%d)@%lx: %lx\n", i, AT91_UDP_CSR(i), at91_udp_read(udc, AT91_UDP_CSR(i)));
+	}
 }
 
 /*-------------------------------------------------------------------------*/
@@ -1032,6 +1036,7 @@ printf("%s: **************** is_on : %d\n", __func__, is_on);
 
 	if (is_on) {
 		clk_on(udc);
+//		at91_udp_write(udc, AT91_UDP_IER, MINIMUS_INTERRUPTUS); /* from HS for testing */
 		at91_udp_write(udc, AT91_UDP_ICR, AT91_UDP_RXRSM);
 		at91_udp_write(udc, AT91_UDP_TXVC, 0);
 		if (cpu_is_at91rm9200())
@@ -1079,7 +1084,6 @@ printf("%s: **************** is_on : %d\n", __func__, is_on);
 	print_register("pullup", udc);
 }
 
-#ifndef __UBOOT__
 /* vbus is here!  turn everything on that's ready */
 static int at91_vbus_session(struct usb_gadget *gadget, int is_active)
 {
@@ -1096,7 +1100,6 @@ static int at91_vbus_session(struct usb_gadget *gadget, int is_active)
 	spin_unlock_irqrestore(&udc->lock, flags);
 	return 0;
 }
-#endif
 
 static int at91_pullup(struct usb_gadget *gadget, int is_on)
 {
@@ -1132,9 +1135,7 @@ static const struct usb_gadget_ops at91_udc_ops = {
 	.get_frame		= at91_get_frame,
 	.wakeup			= at91_wakeup,
 	.set_selfpowered	= at91_set_selfpowered,
-#ifndef __UBOOT__
 	.vbus_session		= at91_vbus_session,
-#endif
 	.pullup			= at91_pullup,
 #ifndef __UBOOT__
 	.udc_start		= at91_start,
@@ -1156,6 +1157,7 @@ static int handle_ep(struct at91_ep *ep)
 	u32 __iomem		*creg = ep->creg;
 	u32			csr = __raw_readl(creg);
 
+printf("%s: *************\n", __func__);
 	if (!list_empty(&ep->queue))
 		req = list_entry(ep->queue.next,
 			struct at91_request, queue);
@@ -1201,6 +1203,7 @@ static void handle_setup(struct at91_udc *udc, struct at91_ep *ep, u32 csr)
 	union setup	pkt;
 	int		status = 0;
 
+printf("%s: *************\n", __func__);
 	/* read and ack SETUP; hard-fail for bogus packets */
 	rxcount = (csr & AT91_UDP_RXBYTECNT) >> 16;
 	if (likely(rxcount == 8)) {
@@ -1437,6 +1440,7 @@ static void handle_ep0(struct at91_udc *udc)
 	u32			csr = __raw_readl(creg);
 	struct at91_request	*req;
 
+printf("%s: *************\n", __func__);
 	if (unlikely(csr & AT91_UDP_STALLSENT)) {
 		nuke(ep0, -EPROTO);
 		udc->req_pending = 0;
