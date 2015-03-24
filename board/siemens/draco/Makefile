@@ -13,9 +13,13 @@
 
 ifdef CONFIG_SPL_BUILD
 obj-y	:= mux.o
+ifdef CONFIG_SPL_CMT
+obj-y	+= ../common/spl_memory_compliance_test.o
+endif
 endif
 
 obj-y	+= board.o
+
 ifndef CONFIG_SPL_BUILD
 obj-y += ../common/factoryset.o
 endif

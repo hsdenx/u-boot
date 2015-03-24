@@ -9,7 +9,6 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
-
 #include <common.h>
 #include <errno.h>
 #include <spl.h>
@@ -54,11 +53,16 @@ void set_mux_conf_regs(void)
 	enable_board_pin_mux();
 }
 
+
 void sdram_init(void)
 {
 	spl_siemens_board_init();
 	board_init_ddr();
-
+#ifdef CONFIG_SPL_BUILD
+#ifdef CONFIG_SPL_CMT	
+	spl_siemens_cmt();
+#endif
+#endif
 	return;
 }
 #endif /* #ifdef CONFIG_SPL_BUILD */

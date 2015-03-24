@@ -37,7 +37,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #ifdef CONFIG_SPL_BUILD
-static struct draco_baseboard_id __attribute__((section(".data"))) settings;
+volatile struct draco_baseboard_id __attribute__((section(".data"))) settings;
 
 #if DDR_PLL_FREQ == 303
 /* Default@303MHz-i0 */
@@ -47,6 +47,7 @@ const struct ddr3_data ddr3_default = {
 	0x0000093B, 0x0000014A,
 	"default name @303MHz           \0",
 	"default marking                \0",
+	0xFFFFFFFF,0xFFFFFFFF,0xFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
 };
 #elif DDR_PLL_FREQ == 400
 /* Default@400MHz-i0 */
@@ -56,6 +57,7 @@ const struct ddr3_data ddr3_default = {
 	0x00000618, 0x0000014A,
 	"default name @400MHz           \0",
 	"default marking                \0",
+	0xFFFFFFFF,0xFFFFFFFF,0xFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
 };
 #endif
 
@@ -92,6 +94,10 @@ static void print_ddr3_timings(void)
 	PRINTARGS(sdram_config);
 	PRINTARGS(ref_ctrl);
 	PRINTARGS(ioctr_val);
+
+	PRINTARGS(sdramc_pattern1);
+	PRINTARGS(sdramc_pattern2);
+	PRINTARGS(sdramc_mode);	
 }
 
 static void print_chip_data(void)

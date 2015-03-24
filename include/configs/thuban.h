@@ -58,6 +58,14 @@
 /* Watchdog */
 #define CONFIG_OMAP_WATCHDOG
 
+/* use both define to compile a SPL compliance test  */
+#if defined(CONFIG_SPL_CMT)
+#define CONFIG_SPL_DRACO 
+#define CONFIG_SPL_CMT_DEBUG
+#define CONFIG_SPL_DRACO
+#define CONFIG_SPL_DRACO_CMT_DEBUG
+#endif
+
 /* Define own nand partitions */
 #define CONFIG_ENV_OFFSET_REDUND    0x2E0000
 #define CONFIG_ENV_SIZE_REDUND      0x2000

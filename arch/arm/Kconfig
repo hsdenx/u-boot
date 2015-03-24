@@ -373,6 +373,13 @@ config TARGET_THUBAN
 	select CPU_V7
 	select SUPPORT_SPL
 
+config SPL_CMT
+	boolean "Enable SPL compliance Test" if EXPERT
+	depends on TARGET_THUBAN
+	default n
+	---help---
+	Say Y here to enable SPL compliance Test
+
 config TARGET_RASTABAN
 	bool "Support rastaban"
 	select CPU_V7
