@@ -25,6 +25,7 @@
 #include <asm/arch/sromc.h>
 #include <lcd.h>
 #include <samsung/misc.h>
+#include <usb.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -329,18 +330,6 @@ int board_late_init(void)
 }
 #endif
 
-int arch_early_init_r(void)
-{
-#ifdef CONFIG_CROS_EC
-	if (cros_ec_board_init()) {
-		printf("%s: Failed to init EC\n", __func__);
-		return 0;
-	}
-#endif
-
-	return 0;
-}
-
 #ifdef CONFIG_MISC_INIT_R
 int misc_init_r(void)
 {
@@ -385,4 +374,9 @@ void reset_misc(void)
 		mdelay(10);
 		dm_gpio_set_value(&gpio, 1);
 	}
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	return 0;
 }

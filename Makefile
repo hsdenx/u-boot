@@ -1,7 +1,7 @@
 VERSION = 2015
 PATCHLEVEL = 04
 SUBLEVEL =
-EXTRAVERSION = -rc4
+EXTRAVERSION =
 NAME =
 
 # *DOCUMENTATION*
@@ -469,10 +469,10 @@ KBUILD_DEFCONFIG := sandbox_defconfig
 export KBUILD_DEFCONFIG KBUILD_KCONFIG
 
 config: scripts_basic outputmakefile FORCE
-	+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/multiconfig.sh $@
+	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
 %config: scripts_basic outputmakefile FORCE
-	+$(Q)$(CONFIG_SHELL) $(srctree)/scripts/multiconfig.sh $@
+	$(Q)$(MAKE) $(build)=scripts/kconfig $@
 
 else
 # ===========================================================================
@@ -496,6 +496,15 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
 # we execute the config step to be sure to catch updated Kconfig files
 include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
+	@# If the following part fails, include/config/auto.conf should be
+	@# deleted so "make silentoldconfig" will be re-run on the next build.
+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.autoconf || \
+		{ rm -f include/config/auto.conf; false; }
+	@# include/config.h has been updated after "make silentoldconfig".
+	@# We need to touch include/config/auto.conf so it gets newer
+	@# than include/config.h.
+	@# Otherwise, 'make silentoldconfig' would be invoked twice.
+	$(Q)touch include/config/auto.conf
 
 -include include/autoconf.mk
 -include include/autoconf.mk.dep
@@ -504,11 +513,15 @@ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
 # is up-to-date. When we switch to a different board configuration, old CONFIG
 # macros are still remaining in include/config/auto.conf. Without the following
 # gimmick, wrong config.mk would be included leading nasty warnings/errors.
-autoconf_is_current := $(if $(wildcard $(KCONFIG_CONFIG)),$(shell find . \
-		-path ./include/config/auto.conf -newer $(KCONFIG_CONFIG)))
-ifneq ($(autoconf_is_current),)
+ifneq ($(wildcard $(KCONFIG_CONFIG)),)
+ifneq ($(wildcard include/config/auto.conf),)
+autoconf_is_old := $(shell find . -path ./$(KCONFIG_CONFIG) -newer \
+						include/config/auto.conf)
+ifeq ($(autoconf_is_old),)
 include $(srctree)/config.mk
 include $(srctree)/arch/$(ARCH)/Makefile
+endif
+endif
 endif
 
 # If board code explicitly specified LDSCRIPT or CONFIG_SYS_LDSCRIPT, use
@@ -637,8 +650,11 @@ libs-y += drivers/spi/
 libs-$(CONFIG_FMAN_ENET) += drivers/net/fm/
 libs-$(CONFIG_SYS_FSL_DDR) += drivers/ddr/fsl/
 libs-y += drivers/serial/
+libs-y += drivers/usb/dwc3/
+libs-y += drivers/usb/emul/
 libs-y += drivers/usb/eth/
 libs-y += drivers/usb/gadget/
+libs-y += drivers/usb/gadget/udc/
 libs-y += drivers/usb/host/
 libs-y += drivers/usb/musb/
 libs-y += drivers/usb/musb-new/
@@ -713,7 +729,7 @@ DO_STATIC_RELA =
 endif
 
 # Always append ALL so that arch config.mk's can add custom ones
-ALL-y += u-boot.srec u-boot.bin System.map binary_size_check
+ALL-y += u-boot.srec u-boot.bin System.map u-boot.cfg binary_size_check
 
 ALL-$(CONFIG_ONENAND_U_BOOT) += u-boot-onenand.bin
 ifeq ($(CONFIG_SPL_FSL_PBL),y)
@@ -855,6 +871,11 @@ ifndef CONFIG_SYS_UBOOT_START
 CONFIG_SYS_UBOOT_START := 0
 endif
 
+# Create a file containing the configuration options the image was built with
+quiet_cmd_cpp_cfg = CFG     $@
+cmd_cpp_cfg = $(CPP) -Wp,-MD,$(depfile) $(cpp_flags) $(LDPPFLAGS) -ansi \
+		-D__ASSEMBLY__ -x assembler-with-cpp -P -dM -E -o $@ $<
+
 MKIMAGEFLAGS_u-boot.img = -A $(ARCH) -T firmware -C none -O u-boot \
 	-a $(CONFIG_SYS_TEXT_BASE) -e $(CONFIG_SYS_UBOOT_START) \
 	-n "U-Boot $(UBOOTRELEASE) for $(BOARD) board"
@@ -885,6 +906,9 @@ u-boot.sha1:	u-boot.bin
 u-boot.dis:	u-boot
 		$(OBJDUMP) -d $< > $@
 
+u-boot.cfg:	include/config.h
+	$(call if_changed,cpp_cfg)
+
 ifdef CONFIG_TPL
 SPL_PAYLOAD := tpl/u-boot-with-tpl.bin
 else
@@ -895,6 +919,26 @@ OBJCOPYFLAGS_u-boot-with-spl.bin = -I binary -O binary \
 				   --pad-to=$(CONFIG_SPL_PAD_TO)
 u-boot-with-spl.bin: spl/u-boot-spl.bin $(SPL_PAYLOAD) FORCE
 	$(call if_changed,pad_cat)
+
+MKIMAGEFLAGS_lpc32xx-spl.img = -T lpc32xximage -a $(CONFIG_SPL_TEXT_BASE)
+
+lpc32xx-spl.img: spl/u-boot-spl.bin FORCE
+	$(call if_changed,mkimage)
+
+OBJCOPYFLAGS_lpc32xx-boot-0.bin = -I binary -O binary --pad-to=$(CONFIG_SPL_PAD_TO)
+
+lpc32xx-boot-0.bin: lpc32xx-spl.img
+	$(call if_changed,objcopy)
+
+OBJCOPYFLAGS_lpc32xx-boot-1.bin = -I binary -O binary --pad-to=$(CONFIG_SPL_PAD_TO)
+
+lpc32xx-boot-1.bin: lpc32xx-spl.img
+	$(call if_changed,objcopy)
+
+lpc32xx-full.bin: lpc32xx-boot-0.bin lpc32xx-boot-1.bin u-boot.img
+	$(call if_changed,cat)
+
+CLEAN_FILES += lpc32xx-*
 
 OBJCOPYFLAGS_u-boot-with-tpl.bin = -I binary -O binary \
 				   --pad-to=$(CONFIG_TPL_PAD_TO)
@@ -1154,7 +1198,7 @@ prepare2: prepare3 outputmakefile
 
 prepare1: prepare2 $(version_h) $(timestamp_h) \
                    include/config/auto.conf
-ifeq ($(__HAVE_ARCH_GENERIC_BOARD),)
+ifeq ($(CONFIG_HAVE_GENERIC_BOARD),)
 ifeq ($(CONFIG_SYS_GENERIC_BOARD),y)
 	@echo >&2 "  Your architecture does not support generic board."
 	@echo >&2 "  Please undefine CONFIG_SYS_GENERIC_BOARD in your board config file."

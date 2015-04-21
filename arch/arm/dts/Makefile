@@ -24,7 +24,7 @@ dtb-$(CONFIG_TEGRA) += tegra20-harmony.dtb \
 	tegra20-trimslice.dtb \
 	tegra20-ventana.dtb \
 	tegra20-whistler.dtb \
-	tegra20-colibri_t20_iris.dtb \
+	tegra20-colibri.dtb \
 	tegra30-apalis.dtb \
 	tegra30-beaver.dtb \
 	tegra30-cardhu.dtb \
@@ -53,6 +53,9 @@ dtb-$(CONFIG_SOCFPGA) +=				\
 	socfpga_arria5_socdk.dtb			\
 	socfpga_cyclone5_socdk.dtb			\
 	socfpga_cyclone5_socrates.dtb
+
+dtb-$(CONFIG_LS102XA) += ls1021a-qds.dtb \
+	ls1021a-twr.dtb
 
 targets += $(dtb-y)
 

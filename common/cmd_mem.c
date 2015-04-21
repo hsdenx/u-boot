@@ -20,6 +20,7 @@
 #endif
 #include <hash.h>
 #include <inttypes.h>
+#include <mapmem.h>
 #include <watchdog.h>
 #include <asm/io.h>
 #include <linux/compiler.h>
@@ -165,7 +166,7 @@ static int do_mem_mw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 #endif
 	ulong	addr, count;
 	int	size;
-	void *buf;
+	void *buf, *start;
 	ulong bytes;
 
 	if ((argc < 3) || (argc > 4))
@@ -197,7 +198,8 @@ static int do_mem_mw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 	}
 
 	bytes = size * count;
-	buf = map_sysmem(addr, bytes);
+	start = map_sysmem(addr, bytes);
+	buf = start;
 	while (count-- > 0) {
 		if (size == 4)
 			*((u32 *)buf) = (u32)writeval;
@@ -211,7 +213,7 @@ static int do_mem_mw(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 			*((u8 *)buf) = (u8)writeval;
 		buf += size;
 	}
-	unmap_sysmem(buf);
+	unmap_sysmem(start);
 	return 0;
 }
 
@@ -999,10 +1001,10 @@ static int do_mem_mtest(cmd_tbl_t *cmdtp, int flag, int argc,
 {
 	ulong start, end;
 	vu_long *buf, *dummy;
-	int iteration_limit;
+	ulong iteration_limit = 0;
 	int ret;
 	ulong errs = 0;	/* number of errors, or -1 if interrupted */
-	ulong pattern;
+	ulong pattern = 0;
 	int iteration;
 #if defined(CONFIG_SYS_ALT_MEMTEST)
 	const int alt_test = 1;
@@ -1010,25 +1012,29 @@ static int do_mem_mtest(cmd_tbl_t *cmdtp, int flag, int argc,
 	const int alt_test = 0;
 #endif
 
+	start = CONFIG_SYS_MEMTEST_START;
+	end = CONFIG_SYS_MEMTEST_END;
+
 	if (argc > 1)
-		start = simple_strtoul(argv[1], NULL, 16);
-	else
-		start = CONFIG_SYS_MEMTEST_START;
+		if (strict_strtoul(argv[1], 16, &start) < 0)
+			return CMD_RET_USAGE;
 
 	if (argc > 2)
-		end = simple_strtoul(argv[2], NULL, 16);
-	else
-		end = CONFIG_SYS_MEMTEST_END;
+		if (strict_strtoul(argv[2], 16, &end) < 0)
+			return CMD_RET_USAGE;
 
 	if (argc > 3)
-		pattern = (ulong)simple_strtoul(argv[3], NULL, 16);
-	else
-		pattern = 0;
+		if (strict_strtoul(argv[3], 16, &pattern) < 0)
+			return CMD_RET_USAGE;
 
 	if (argc > 4)
-		iteration_limit = (ulong)simple_strtoul(argv[4], NULL, 16);
-	else
-		iteration_limit = 0;
+		if (strict_strtoul(argv[4], 16, &iteration_limit) < 0)
+			return CMD_RET_USAGE;
+
+	if (end < start) {
+		printf("Refusing to do empty test\n");
+		return -1;
+	}
 
 	printf("Testing %08x ... %08x:\n", (uint)start, (uint)end);
 	debug("%s:%d: start %#08lx end %#08lx\n", __func__, __LINE__,
@@ -1079,7 +1085,7 @@ static int do_mem_mtest(cmd_tbl_t *cmdtp, int flag, int argc,
 		ret = errs != 0;
 	}
 
-	return ret;	/* not reached */
+	return ret;
 }
 #endif	/* CONFIG_CMD_MEMTEST */
 

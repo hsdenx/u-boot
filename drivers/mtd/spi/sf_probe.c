@@ -13,6 +13,7 @@
 #include <errno.h>
 #include <fdtdec.h>
 #include <malloc.h>
+#include <mapmem.h>
 #include <spi.h>
 #include <spi_flash.h>
 #include <asm/io.h>
@@ -458,7 +459,7 @@ void spi_flash_free(struct spi_flash *flash)
 static int spi_flash_std_read(struct udevice *dev, u32 offset, size_t len,
 			      void *buf)
 {
-	struct spi_flash *flash = dev->uclass_priv;
+	struct spi_flash *flash = dev_get_uclass_priv(dev);
 
 	return spi_flash_cmd_read_ops(flash, offset, len, buf);
 }
@@ -466,14 +467,14 @@ static int spi_flash_std_read(struct udevice *dev, u32 offset, size_t len,
 int spi_flash_std_write(struct udevice *dev, u32 offset, size_t len,
 			const void *buf)
 {
-	struct spi_flash *flash = dev->uclass_priv;
+	struct spi_flash *flash = dev_get_uclass_priv(dev);
 
 	return spi_flash_cmd_write_ops(flash, offset, len, buf);
 }
 
 int spi_flash_std_erase(struct udevice *dev, u32 offset, size_t len)
 {
-	struct spi_flash *flash = dev->uclass_priv;
+	struct spi_flash *flash = dev_get_uclass_priv(dev);
 
 	return spi_flash_cmd_erase_ops(flash, offset, len);
 }
@@ -484,7 +485,7 @@ int spi_flash_std_probe(struct udevice *dev)
 	struct dm_spi_slave_platdata *plat = dev_get_parent_platdata(dev);
 	struct spi_flash *flash;
 
-	flash = dev->uclass_priv;
+	flash = dev_get_uclass_priv(dev);
 	flash->dev = dev;
 	debug("%s: slave=%p, cs=%d\n", __func__, slave, plat->cs);
 	return spi_flash_probe_slave(slave, flash);

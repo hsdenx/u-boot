@@ -33,6 +33,7 @@
 #endif
 #include <logbuff.h>
 #include <malloc.h>
+#include <mapmem.h>
 #ifdef CONFIG_BITBANGMII
 #include <miiphy.h>
 #endif
@@ -230,7 +231,9 @@ static int initr_unlock_ram_in_cache(void)
 #ifdef CONFIG_PCI
 static int initr_pci(void)
 {
+#ifndef CONFIG_DM_PCI
 	pci_init();
+#endif
 
 	return 0;
 }
@@ -587,7 +590,7 @@ static int initr_bbmii(void)
 static int initr_net(void)
 {
 	puts("Net:   ");
-	eth_initialize(gd->bd);
+	eth_initialize();
 #if defined(CONFIG_RESET_PHY_R)
 	debug("Reset Ethernet PHY\n");
 	reset_phy();
@@ -776,9 +779,6 @@ init_fnc_t init_sequence_r[] = {
 #endif
 #ifdef CONFIG_PPC
 	initr_spi,
-#endif
-#if defined(CONFIG_X86) && defined(CONFIG_SPI)
-	init_func_spi,
 #endif
 #ifdef CONFIG_CMD_NAND
 	initr_nand,

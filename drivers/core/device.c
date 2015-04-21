@@ -24,8 +24,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-int device_bind(struct udevice *parent, struct driver *drv, const char *name,
-		void *platdata, int of_offset, struct udevice **devp)
+int device_bind(struct udevice *parent, const struct driver *drv,
+		const char *name, void *platdata, int of_offset,
+		struct udevice **devp)
 {
 	struct udevice *dev;
 	struct uclass *uc;
@@ -164,9 +165,24 @@ int device_bind_by_name(struct udevice *parent, bool pre_reloc_only,
 			   -1, devp);
 }
 
+static void *alloc_priv(int size, uint flags)
+{
+	void *priv;
+
+	if (flags & DM_FLAG_ALLOC_PRIV_DMA) {
+		priv = memalign(ARCH_DMA_MINALIGN, size);
+		if (priv)
+			memset(priv, '\0', size);
+	} else {
+		priv = calloc(1, size);
+	}
+
+	return priv;
+}
+
 int device_probe_child(struct udevice *dev, void *parent_priv)
 {
-	struct driver *drv;
+	const struct driver *drv;
 	int size = 0;
 	int ret;
 	int seq;
@@ -182,7 +198,7 @@ int device_probe_child(struct udevice *dev, void *parent_priv)
 
 	/* Allocate private data if requested */
 	if (drv->priv_auto_alloc_size) {
-		dev->priv = calloc(1, drv->priv_auto_alloc_size);
+		dev->priv = alloc_priv(drv->priv_auto_alloc_size, drv->flags);
 		if (!dev->priv) {
 			ret = -ENOMEM;
 			goto fail;
@@ -206,7 +222,7 @@ int device_probe_child(struct udevice *dev, void *parent_priv)
 					per_child_auto_alloc_size;
 		}
 		if (size) {
-			dev->parent_priv = calloc(1, size);
+			dev->parent_priv = alloc_priv(size, drv->flags);
 			if (!dev->parent_priv) {
 				ret = -ENOMEM;
 				goto fail;
@@ -227,7 +243,9 @@ int device_probe_child(struct udevice *dev, void *parent_priv)
 	}
 	dev->seq = seq;
 
-	ret = uclass_pre_probe_child(dev);
+	dev->flags |= DM_FLAG_ACTIVATED;
+
+	ret = uclass_pre_probe_device(dev);
 	if (ret)
 		goto fail;
 
@@ -243,19 +261,18 @@ int device_probe_child(struct udevice *dev, void *parent_priv)
 			goto fail;
 	}
 
+	dev->flags |= DM_FLAG_ACTIVATED;
 	if (drv->probe) {
 		ret = drv->probe(dev);
-		if (ret)
+		if (ret) {
+			dev->flags &= ~DM_FLAG_ACTIVATED;
 			goto fail;
+		}
 	}
-
-	dev->flags |= DM_FLAG_ACTIVATED;
 
 	ret = uclass_post_probe_device(dev);
-	if (ret) {
-		dev->flags &= ~DM_FLAG_ACTIVATED;
+	if (ret)
 		goto fail_uclass;
-	}
 
 	return 0;
 fail_uclass:
@@ -264,6 +281,8 @@ fail_uclass:
 			__func__, dev->name);
 	}
 fail:
+	dev->flags &= ~DM_FLAG_ACTIVATED;
+
 	dev->seq = -1;
 	device_free(dev);
 
@@ -303,6 +322,16 @@ void *dev_get_priv(struct udevice *dev)
 	}
 
 	return dev->priv;
+}
+
+void *dev_get_uclass_priv(struct udevice *dev)
+{
+	if (!dev) {
+		dm_warn("%s: null device\n", __func__);
+		return NULL;
+	}
+
+	return dev->uclass_priv;
 }
 
 void *dev_get_parentdata(struct udevice *dev)
@@ -440,9 +469,9 @@ struct udevice *dev_get_parent(struct udevice *child)
 	return child->parent;
 }
 
-ulong dev_get_of_data(struct udevice *dev)
+ulong dev_get_driver_data(struct udevice *dev)
 {
-	return dev->of_id->data;
+	return dev->driver_data;
 }
 
 enum uclass_id device_get_uclass_id(struct udevice *dev)
@@ -461,3 +490,31 @@ fdt_addr_t dev_get_addr(struct udevice *dev)
 	return FDT_ADDR_T_NONE;
 }
 #endif
+
+bool device_has_children(struct udevice *dev)
+{
+	return !list_empty(&dev->child_head);
+}
+
+bool device_has_active_children(struct udevice *dev)
+{
+	struct udevice *child;
+
+	for (device_find_first_child(dev, &child);
+	     child;
+	     device_find_next_child(&child)) {
+		if (device_active(child))
+			return true;
+	}
+
+	return false;
+}
+
+bool device_is_last_sibling(struct udevice *dev)
+{
+	struct udevice *parent = dev->parent;
+
+	if (!parent)
+		return false;
+	return list_is_last(&dev->sibling_node, &parent->child_head);
+}

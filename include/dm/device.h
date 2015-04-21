@@ -30,6 +30,9 @@ struct driver_info;
 /* DM is responsible for allocating and freeing parent_platdata */
 #define DM_FLAG_ALLOC_PARENT_PDATA	(1 << 3)
 
+/* Allocate driver private data on a DMA boundary */
+#define DM_FLAG_ALLOC_PRIV_DMA	(1 << 4)
+
 /**
  * struct udevice - An instance of a driver
  *
@@ -52,7 +55,8 @@ struct driver_info;
  * @platdata: Configuration data for this device
  * @parent_platdata: The parent bus's configuration data for this device
  * @of_offset: Device tree node offset for this device (- for none)
- * @of_id: Pointer to the udevice_id structure which created the device
+ * @driver_data: Driver data word for the entry that matched this device with
+ *		its driver
  * @parent: Parent of this device, or NULL for the top level device
  * @priv: Private data for this device
  * @uclass: Pointer to uclass for this device
@@ -67,12 +71,12 @@ struct driver_info;
  * when the device is probed and will be unique within the device's uclass.
  */
 struct udevice {
-	struct driver *driver;
+	const struct driver *driver;
 	const char *name;
 	void *platdata;
 	void *parent_platdata;
 	int of_offset;
-	const struct udevice_id *of_id;
+	ulong driver_data;
 	struct udevice *parent;
 	void *priv;
 	struct uclass *uclass;
@@ -238,13 +242,28 @@ void *dev_get_priv(struct udevice *dev);
 struct udevice *dev_get_parent(struct udevice *child);
 
 /**
- * dev_get_of_data() - get the device tree data used to bind a device
+ * dev_get_uclass_priv() - Get the private uclass data for a device
+ *
+ * This checks that dev is not NULL, but no other checks for now
+ *
+ * @dev		Device to check
+ * @return private uclass data for this device, or NULL if none
+ */
+void *dev_get_uclass_priv(struct udevice *dev);
+
+/**
+ * dev_get_driver_data() - get the driver data used to bind a device
  *
  * When a device is bound using a device tree node, it matches a
  * particular compatible string as in struct udevice_id. This function
- * returns the associated data value for that compatible string
+ * returns the associated data value for that compatible string. This is
+ * the 'data' field in struct udevice_id.
+ *
+ * For USB devices, this is the driver_info field in struct usb_device_id.
+ *
+ * @dev:	Device to check
  */
-ulong dev_get_of_data(struct udevice *dev);
+ulong dev_get_driver_data(struct udevice *dev);
 
 /*
  * device_get_uclass_id() - return the uclass ID of a device
@@ -360,5 +379,35 @@ int device_find_next_child(struct udevice **devp);
  * @return addr
  */
 fdt_addr_t dev_get_addr(struct udevice *dev);
+
+/**
+ * device_has_children() - check if a device has any children
+ *
+ * @dev:	Device to check
+ * @return true if the device has one or more children
+ */
+bool device_has_children(struct udevice *dev);
+
+/**
+ * device_has_active_children() - check if a device has any active children
+ *
+ * @dev:	Device to check
+ * @return true if the device has one or more children and at least one of
+ * them is active (probed).
+ */
+bool device_has_active_children(struct udevice *dev);
+
+/**
+ * device_is_last_sibling() - check if a device is the last sibling
+ *
+ * This function can be useful for display purposes, when special action needs
+ * to be taken when displaying the last sibling. This can happen when a tree
+ * view of devices is being displayed.
+ *
+ * @dev:	Device to check
+ * @return true if there are no more siblings after this one - i.e. is it
+ * last in the list.
+ */
+bool device_is_last_sibling(struct udevice *dev);
 
 #endif

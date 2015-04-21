@@ -23,6 +23,7 @@
 #include <i2c.h>
 #include <initcall.h>
 #include <logbuff.h>
+#include <mapmem.h>
 
 /* TODO: Can we move these into arch/ headers? */
 #ifdef CONFIG_8xx
@@ -47,7 +48,7 @@
 #include <asm/errno.h>
 #include <asm/io.h>
 #include <asm/sections.h>
-#ifdef CONFIG_X86
+#if defined(CONFIG_X86) || defined(CONFIG_ARC)
 #include <asm/init_helpers.h>
 #include <asm/relocate.h>
 #endif
@@ -494,7 +495,7 @@ static int reserve_trace(void)
 
 #if defined(CONFIG_VIDEO) && (!defined(CONFIG_PPC) || defined(CONFIG_8xx)) && \
 		!defined(CONFIG_ARM) && !defined(CONFIG_X86) && \
-		!defined(CONFIG_BLACKFIN)
+		!defined(CONFIG_BLACKFIN) && !defined(CONFIG_M68K)
 static int reserve_video(void)
 {
 	/* reserve memory for video display (always full pages) */
@@ -761,7 +762,7 @@ static int jump_to_copy(void)
 	 * similarly for all archs. When we do generic relocation, hopefully
 	 * we can make all archs enable the dcache prior to relocation.
 	 */
-#ifdef CONFIG_X86
+#if defined(CONFIG_X86) || defined(CONFIG_ARC)
 	/*
 	 * SDRAM and console are now initialised. The final stack can now
 	 * be setup in SDRAM. Code execution will continue in Flash, but
@@ -815,6 +816,11 @@ __weak int reserve_arch(void)
 	return 0;
 }
 
+__weak int arch_cpu_init_dm(void)
+{
+	return 0;
+}
+
 static init_fnc_t init_sequence_f[] = {
 #ifdef CONFIG_SANDBOX
 	setup_ram_buf,
@@ -835,6 +841,7 @@ static init_fnc_t init_sequence_f[] = {
 	fdtdec_check_fdt,
 #endif
 	initf_dm,
+	arch_cpu_init_dm,
 #if defined(CONFIG_BOARD_EARLY_INIT_F)
 	board_early_init_f,
 #endif
@@ -968,7 +975,7 @@ static init_fnc_t init_sequence_f[] = {
 	/* TODO: Why the dependency on CONFIG_8xx? */
 #if defined(CONFIG_VIDEO) && (!defined(CONFIG_PPC) || defined(CONFIG_8xx)) && \
 		!defined(CONFIG_ARM) && !defined(CONFIG_X86) && \
-		!defined(CONFIG_BLACKFIN)
+		!defined(CONFIG_BLACKFIN) && !defined(CONFIG_M68K)
 	reserve_video,
 #endif
 #if !defined(CONFIG_BLACKFIN) && !defined(CONFIG_NIOS2)
@@ -997,7 +1004,7 @@ static init_fnc_t init_sequence_f[] = {
 	INIT_FUNC_WATCHDOG_RESET
 	reloc_fdt,
 	setup_reloc,
-#ifdef CONFIG_X86
+#if defined(CONFIG_X86) || defined(CONFIG_ARC)
 	copy_uboot_to_ram,
 	clear_bss,
 	do_elf_reloc_fixups,
@@ -1041,7 +1048,7 @@ void board_init_f(ulong boot_flags)
 #endif
 }
 
-#ifdef CONFIG_X86
+#if defined(CONFIG_X86) || defined(CONFIG_ARC)
 /*
  * For now this code is only used on x86.
  *
@@ -1080,7 +1087,9 @@ void board_init_f_r(void)
 	/* NOTREACHED - board_init_r() does not return */
 	hang();
 }
-#else
+#endif /* CONFIG_X86 */
+
+#ifndef CONFIG_X86
 ulong board_init_f_mem(ulong top)
 {
 	/* Leave space for the stack we are running with now */
@@ -1098,4 +1107,4 @@ ulong board_init_f_mem(ulong top)
 
 	return top;
 }
-#endif /* CONFIG_X86 */
+#endif /* !CONFIG_X86 */

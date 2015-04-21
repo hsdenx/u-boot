@@ -5,6 +5,11 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
+ifdef CONFIG_DM_USB
+obj-$(CONFIG_CMD_USB) += usb-uclass.o
+obj-$(CONFIG_SANDBOX) += usb-sandbox.o
+endif
+
 # ohci
 obj-$(CONFIG_USB_OHCI_NEW) += ohci-hcd.o
 obj-$(CONFIG_USB_ATMEL) += ohci-at91.o

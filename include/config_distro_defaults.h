@@ -20,18 +20,28 @@
 #define CONFIG_BOOTP_PXE
 #define CONFIG_BOOTP_SUBNETMASK
 
-#if defined(__arm__)
+#if defined(__arm__) || defined(__aarch64__)
 #define CONFIG_BOOTP_PXE_CLIENTARCH     0x100
 #if defined(__ARM_ARCH_7__) || defined(__ARM_ARCH_7A__)
 #define CONFIG_BOOTP_VCI_STRING         "U-boot.armv7"
+#elif defined(__aarch64__)
+#define CONFIG_BOOTP_VCI_STRING         "U-boot.armv8"
 #else
 #define CONFIG_BOOTP_VCI_STRING         "U-boot.arm"
 #endif
+#elif defined(__i386__)
+#define CONFIG_BOOTP_PXE_CLIENTARCH     0x0
+#elif defined(__x86_64__)
+#define CONFIG_BOOTP_PXE_CLIENTARCH     0x9
 #endif
 
 #define CONFIG_OF_LIBFDT
 
+#ifdef CONFIG_ARM64
+#define CONFIG_CMD_BOOTI
+#else
 #define CONFIG_CMD_BOOTZ
+#endif
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_ELF
 #define CONFIG_CMD_EXT2
