@@ -1,0 +1,6 @@
+nanoRISC iMX6 BOARD
+M:	Waldemar Glensk <waldemar.glensk@msc-technologies.com>
+S:	Maintained
+F:	board/msc/nR_imx6/
+F:	include/configs/msc_nR_imx6.h
+F:	configs/msc_nR_imx6_defconfig

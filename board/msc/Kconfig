@@ -1,0 +1,32 @@
+if TARGET_NR_IMX6
+source "board/msc/nR_imx6/Kconfig"
+
+config USE_UART1
+config USE_UART2
+config USE_UART3
+
+choice
+	prompt "Console device"
+	default USE_UART2
+
+	config USE_UART1
+		bool "ttymxc0"
+
+	config USE_UART2
+		bool "ttymxc1"
+
+	config USE_UART3
+		bool "ttymxc2"
+endchoice
+
+choice
+	prompt "Environment location"
+	default ENV_IS_IN_MMC
+
+	config ENV_IS_IN_MMC
+		bool "mmc0"
+
+	config ENV_IS_IN_SPI_FLASH
+		bool "spi flash"
+endchoice
+endif
