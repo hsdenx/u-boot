@@ -1,0 +1,45 @@
+if TARGET_NR_IMX6
+
+config SYS_BOARD
+	default "nR_imx6"
+
+config SYS_VENDOR
+	default "msc"
+
+config SYS_SOC
+	default "mx6"
+
+config SYS_CONFIG_NAME
+	default "msc_nR_imx6"
+
+config SYS_USE_VIDEO
+	bool
+
+config SYS_USE_HDMI_VIDEO
+	bool "HDMI based display support"
+	default n
+	select SYS_USE_VIDEO
+
+config SYS_USE_LVDS_VIDEO
+	bool "LVDS based panel/display support"
+	default n
+	select SYS_USE_VIDEO
+
+config SYS_USE_LCD_VIDEO
+	bool "LCD (TTL) based panel/display support"
+	default n
+	select SYS_USE_VIDEO
+
+config CMD_BOARDINFO
+	bool "boardinfo command"
+	default y
+	help
+	  command to show msc boardinfo
+
+config BOARDINFO_OVERWRITE_PROTECTION
+	bool "boardinfo overwrite protection"
+	depends on CMD_BOARDINFO
+	default n
+	help
+	  protect boardinfo from overwrites.
+endif

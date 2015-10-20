@@ -1,0 +1,29 @@
+U-Boot for msc-nR-imx6
+----------------------
+
+Building U-boot
+---------------
+
+$ make msc_nR_imx6_config
+$ make
+
+Flashing U-boot into the SD card
+--------------------------------
+
+- After the 'make' command completes, the generated 'SPL' binary must be
+flashed into the SD card;
+
+$ sudo dd if=SPL of=/dev/mmcblk0 bs=1k seek=1; sync
+
+(Note - the SD card node may vary, so adjust this as needed).
+
+- Flash the u-boot.img image into the SD card:
+
+sudo dd if=u-boot.img of=/dev/mmcblk0 bs=1k seek=69; sync
+
+- Insert the SD card into the slot located in the bottom of the board (same side
+as the mx6 processor)
+
+- Connect the serial cable to the host PC
+
+- Power up the board and U-boot messages will appear in the serial console.

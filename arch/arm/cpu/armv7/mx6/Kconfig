@@ -164,6 +164,13 @@ config TARGET_MX6ULL_14X14_EVK
 config TARGET_NITROGEN6X
 	bool "nitrogen6x"
 
+config TARGET_NR_IMX6
+	bool "Support MSC nanoRISC imx6"
+	select CPU_V7
+	select SUPPORT_SPL
+	select DM
+	select DM_THERMAL
+
 config TARGET_OT1200
 	bool "Bachmann OT1200"
 	select SUPPORT_SPL
