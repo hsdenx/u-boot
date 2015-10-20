@@ -563,12 +563,22 @@ static int do_usb_stop_keyboard(int force)
 	return 0;
 }
 
+__weak int usb_post_init(void)
+{
+	return 0;
+}
+
 static void do_usb_start(void)
 {
 	bootstage_mark_name(BOOTSTAGE_ID_USB_START, "usb_start");
 
 	if (usb_init() < 0)
 		return;
+
+	if (usb_post_init() != 0) {
+		printf("USB post init failed!\n");
+		return;
+	}
 
 	/* Driver model will probe the devices as they are found */
 #ifndef CONFIG_DM_USB
