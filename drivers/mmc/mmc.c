@@ -407,46 +407,51 @@ static int sd_send_op_cond(struct mmc *mmc)
 	return 0;
 }
 
-static int mmc_send_op_cond_iter(struct mmc *mmc, int use_arg)
+/* We pass in the cmd since otherwise the init seems to fail */
+static int mmc_send_op_cond_iter(struct mmc *mmc, struct mmc_cmd *cmd,
+		int use_arg)
 {
-	struct mmc_cmd cmd;
 	int err;
 
-	cmd.cmdidx = MMC_CMD_SEND_OP_COND;
-	cmd.resp_type = MMC_RSP_R3;
-	cmd.cmdarg = 0;
-	if (use_arg && !mmc_host_is_spi(mmc))
-		cmd.cmdarg = OCR_HCS |
+	cmd->cmdidx = MMC_CMD_SEND_OP_COND;
+	cmd->resp_type = MMC_RSP_R3;
+	cmd->cmdarg = 0;
+	if (use_arg && !mmc_host_is_spi(mmc)) {
+		cmd->cmdarg =
 			(mmc->cfg->voltages &
-			(mmc->ocr & OCR_VOLTAGE_MASK)) |
-			(mmc->ocr & OCR_ACCESS_MODE);
+			(mmc->op_cond_response & OCR_VOLTAGE_MASK)) |
+			(mmc->op_cond_response & OCR_ACCESS_MODE);
 
-	err = mmc_send_cmd(mmc, &cmd, NULL);
+		if (mmc->cfg->host_caps & MMC_MODE_HC)
+			cmd->cmdarg |= OCR_HCS;
+	}
+	err = mmc_send_cmd(mmc, cmd, NULL);
 	if (err)
 		return err;
-	mmc->ocr = cmd.response[0];
+	mmc->op_cond_response = cmd->response[0];
 	return 0;
 }
 
 static int mmc_send_op_cond(struct mmc *mmc)
 {
+	struct mmc_cmd cmd;
 	int err, i;
 
 	/* Some cards seem to need this */
 	mmc_go_idle(mmc);
 
  	/* Asking to the card its capabilities */
+	mmc->op_cond_pending = 1;
 	for (i = 0; i < 2; i++) {
-		err = mmc_send_op_cond_iter(mmc, i != 0);
+		err = mmc_send_op_cond_iter(mmc, &cmd, i != 0);
 		if (err)
 			return err;
 
 		/* exit if not busy (flag seems to be inverted) */
-		if (mmc->ocr & OCR_BUSY)
-			break;
+		if (mmc->op_cond_response & OCR_BUSY)
+			return 0;
 	}
-	mmc->op_cond_pending = 1;
-	return 0;
+	return IN_PROGRESS;
 }
 
 static int mmc_complete_op_cond(struct mmc *mmc)
@@ -457,21 +462,23 @@ static int mmc_complete_op_cond(struct mmc *mmc)
 	int err;
 
 	mmc->op_cond_pending = 0;
-	if (!(mmc->ocr & OCR_BUSY)) {
-		/* Some cards seem to need this */
-		mmc_go_idle(mmc);
-
-		start = get_timer(0);
-		while (1) {
-			err = mmc_send_op_cond_iter(mmc, 1);
-			if (err)
-				return err;
-			if (mmc->ocr & OCR_BUSY)
-				break;
-			if (get_timer(start) > timeout)
-				return -EOPNOTSUPP;
-			udelay(100);
-		}
+	start = get_timer(0);
+	/*
+	 * If in mmc_send_op_cond, OCR_BUSY is set in CMD1's response, then
+	 * state is transfered to Ready state, and there is no need to
+	 * send CMD1 again. Otherwise following CMD1 will recieve no response,
+	 * or timeour error from driver such as fsl_esdhc.c.
+	 *
+	 * If not into Ready state in previous CMD1, then continue CMD1
+	 * command.
+	 */
+	while (!(mmc->op_cond_response & OCR_BUSY)) {
+		err = mmc_send_op_cond_iter(mmc, &cmd, 1);
+		if (err)
+			return err;
+		if (get_timer(start) > timeout)
+			return UNUSABLE_ERR;
+		udelay(100);
 	}
 
 	if (mmc_host_is_spi(mmc)) { /* read OCR for spi */
@@ -483,11 +490,13 @@ static int mmc_complete_op_cond(struct mmc *mmc)
 
 		if (err)
 			return err;
-
-		mmc->ocr = cmd.response[0];
 	}
 
 	mmc->version = MMC_VERSION_UNKNOWN;
+	if (mmc_host_is_spi(mmc))
+		mmc->ocr = cmd.response[0];
+	else
+		mmc->ocr = mmc->op_cond_response;
 
 	mmc->high_capacity = ((mmc->ocr & OCR_HCS) == OCR_HCS);
 	mmc->rca = 1;
@@ -1701,7 +1710,7 @@ int mmc_start_init(struct mmc *mmc)
 	if (err == -ETIMEDOUT) {
 		err = mmc_send_op_cond(mmc);
 
-		if (err) {
+		if (err && err != IN_PROGRESS) {
 #if !defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_LIBCOMMON_SUPPORT)
 			printf("Card did not respond to voltage select!\n");
 #endif
@@ -1709,7 +1718,7 @@ int mmc_start_init(struct mmc *mmc)
 		}
 	}
 
-	if (!err)
+	if (err == IN_PROGRESS)
 		mmc->init_in_progress = 1;
 
 	return err;
@@ -1719,7 +1728,6 @@ static int mmc_complete_init(struct mmc *mmc)
 {
 	int err = 0;
 
-	mmc->init_in_progress = 0;
 	if (mmc->op_cond_pending)
 		err = mmc_complete_op_cond(mmc);
 
@@ -1729,12 +1737,13 @@ static int mmc_complete_init(struct mmc *mmc)
 		mmc->has_init = 0;
 	else
 		mmc->has_init = 1;
+	mmc->init_in_progress = 0;
 	return err;
 }
 
 int mmc_init(struct mmc *mmc)
 {
-	int err = 0;
+	int err = IN_PROGRESS;
 	__maybe_unused unsigned start;
 #ifdef CONFIG_DM_MMC
 	struct mmc_uclass_priv *upriv = dev_get_uclass_priv(mmc->dev);
@@ -1749,7 +1758,7 @@ int mmc_init(struct mmc *mmc)
 	if (!mmc->init_in_progress)
 		err = mmc_start_init(mmc);
 
-	if (!err)
+	if (!err || err == IN_PROGRESS)
 		err = mmc_complete_init(mmc);
 	debug("%s: %d, time %lu\n", __func__, err, get_timer(start));
 	return err;

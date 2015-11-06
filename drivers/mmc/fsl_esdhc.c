@@ -431,9 +431,9 @@ esdhc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 
 	/* Workaround for ESDHC errata ENGcm03648 */
 	if (!data && (cmd->resp_type & MMC_RSP_BUSY)) {
-		int timeout = 6000;
+		int timeout = 2500;
 
-		/* Poll on DATA0 line for cmd with busy signal for 600 ms */
+		/* Poll on DATA0 line for cmd with busy signal for 250 ms */
 		while (timeout > 0 && !(esdhc_read32(&regs->prsstat) &
 					PRSSTAT_DAT0)) {
 			udelay(100);
@@ -790,12 +790,7 @@ static int fsl_esdhc_init(struct fsl_esdhc_priv *priv)
 		return -1;
 	}
 
-	if (priv->bus_width == 8)
-		priv->cfg.host_caps = MMC_MODE_4BIT | MMC_MODE_8BIT;
-	else if (priv->bus_width == 4)
-		priv->cfg.host_caps = MMC_MODE_4BIT;
-
-	priv->cfg.host_caps = MMC_MODE_4BIT | MMC_MODE_8BIT;
+	priv->cfg.host_caps = MMC_MODE_4BIT | MMC_MODE_8BIT | MMC_MODE_HC;
 #ifdef CONFIG_SYS_FSL_ESDHC_HAS_DDR_MODE
 	priv->cfg.host_caps |= MMC_MODE_DDR_52MHz;
 #endif
