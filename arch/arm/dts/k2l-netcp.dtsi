@@ -8,7 +8,7 @@
  * published by the Free Software Foundation.
  */
 
-qmss: qmss@2a40000 {
+qmss: qmss_2a40000 {
 	compatible = "ti,keystone-navigator-qmss";
 	dma-coherent;
 	#address-cells = <1>;
@@ -23,7 +23,7 @@ qmss: qmss@2a40000 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
-		qmgr0 {
+		qmgr0@0 {
 			managed-queues = <0 0x2000>;
 			reg = <0x2a40000 0x20000>,
 			      <0x2a06000 0x400>,
@@ -85,7 +85,7 @@ qmss: qmss@2a40000 {
 	};
 }; /* qmss */
 
-knav_dmas: knav_dmas@0 {
+knav_dmas: knav_dmas0 {
 	compatible = "ti,keystone-navigator-dma";
 	clocks = <&papllclk>;
 	#address-cells = <1>;

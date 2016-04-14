@@ -25,11 +25,11 @@
 		stdout-path = &uart0;
 	};
 
-	memory {
+	memory@80000000 {
 		reg = <0x80000000 0x40000000>;
 	};
 
-	gic: interrupt-controller {
+	gic: interrupt-controller@0 {
 		compatible = "arm,cortex-a15-gic";
 		#interrupt-cells = <3>;
 		interrupt-controller;
@@ -270,7 +270,7 @@
 				  1 0 0x21000A00 0x00000100>;
 		};
 
-		kirq0: keystone_irq@26202a0 {
+		kirq0: keystone_irq_26202a0 {
 			compatible = "ti,keystone-irq";
 			interrupts = <GIC_SPI 4 IRQ_TYPE_EDGE_RISING>;
 			interrupt-controller;
