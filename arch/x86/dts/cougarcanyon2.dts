@@ -29,19 +29,19 @@
 	};
 
 	microcode {
-		update@0 {
+		update_0 {
 #include "microcode/m12306a2_00000008.dtsi"
 		};
-		update@1 {
+		update_1 {
 #include "microcode/m12306a4_00000007.dtsi"
 		};
-		update@2 {
+		update_2 {
 #include "microcode/m12306a5_00000007.dtsi"
 		};
-		update@3 {
+		update_3 {
 #include "microcode/m12306a8_00000010.dtsi"
 		};
-		update@4 {
+		update_4 {
 #include "microcode/m12306a9_0000001b.dtsi"
 		};
 	};
@@ -51,7 +51,7 @@
 		fsp,enable-ht;
 	};
 
-	pci {
+	pci@0 {
 		#address-cells = <3>;
 		#size-cells = <2>;
 		compatible = "pci-x86";
@@ -78,21 +78,21 @@
 				};
 			};
 
-			gpioa {
+			gpioa@10 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0 0x10>;
 				bank-name = "A";
 			};
 
-			gpiob {
+			gpiob@30 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x30 0x10>;
 				bank-name = "B";
 			};
 
-			gpioc {
+			gpioc@40 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x40 0x10>;

@@ -69,7 +69,7 @@
 		};
 	};
 
-	pci {
+	pci@0 {
 		compatible = "intel,pci-baytrail", "pci-x86";
 		#address-cells = <3>;
 		#size-cells = <2>;
@@ -159,49 +159,49 @@
 					compatible = "stmicro,n25q064a",
 						"spi-flash";
 					memory-map = <0xff800000 0x00800000>;
-					rw-mrc-cache {
+					rw-mrc-cache@6f0000 {
 						label = "rw-mrc-cache";
 						reg = <0x006f0000 0x00010000>;
 					};
 				};
 			};
 
-			gpioa {
+			gpioa@0 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0 0x20>;
 				bank-name = "A";
 			};
 
-			gpiob {
+			gpiob@20 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x20 0x20>;
 				bank-name = "B";
 			};
 
-			gpioc {
+			gpioc@40 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x40 0x20>;
 				bank-name = "C";
 			};
 
-			gpiod {
+			gpiod@60 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x60 0x20>;
 				bank-name = "D";
 			};
 
-			gpioe {
+			gpioe@80 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x80 0x20>;
 				bank-name = "E";
 			};
 
-			gpiof {
+			gpiof@a0 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0xA0 0x20>;
@@ -268,10 +268,10 @@
 	};
 
 	microcode {
-		update@0 {
+		update_0 {
 #include "microcode/m0130673322.dtsi"
 		};
-		update@1 {
+		update_1 {
 #include "microcode/m0130679901.dtsi"
 		};
 	};

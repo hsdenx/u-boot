@@ -56,7 +56,7 @@
 		dram-faw = <0x00009c40>;
 	};
 
-	pci {
+	pci@0 {
 		#address-cells = <3>;
 		#size-cells = <2>;
 		compatible = "pci-x86";
@@ -128,21 +128,21 @@
 					compatible = "winbond,w25q64",
 						"spi-flash";
 					memory-map = <0xff800000 0x00800000>;
-					rw-mrc-cache {
+					rw-mrc-cache@10000 {
 						label = "rw-mrc-cache";
 						reg = <0x00010000 0x00010000>;
 					};
 				};
 			};
 
-			gpioa {
+			gpioa@0 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0 0x20>;
 				bank-name = "A";
 			};
 
-			gpiob {
+			gpiob@20 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x20 0x20>;

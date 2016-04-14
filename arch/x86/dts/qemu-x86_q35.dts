@@ -53,7 +53,7 @@
 		clock-frequency = <1000000000>;
 	};
 
-	pci {
+	pci@0 {
 		compatible = "pci-x86";
 		#address-cells = <3>;
 		#size-cells = <2>;

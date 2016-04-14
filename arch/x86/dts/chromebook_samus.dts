@@ -65,7 +65,7 @@
 		intel,duplicate-por;
 	};
 
-	pch_pinctrl {
+	pch_pinctrl@0 {
 		compatible = "intel,x86-broadwell-pinctrl";
 		u-boot,dm-pre-reloc;
 		reg = <0 0>;
@@ -131,7 +131,7 @@
 			pirq-apic = <PIRQ_APIC_ROUTE>;
 		};
 
-		soc_gpio@0 {
+		soc_gpio {
 			config =
 				<0 &gpio_unused 0>,	/* unused */
 				<1 &gpio_unused 0>,	/* unused */
@@ -231,7 +231,7 @@
 		};
 	};
 
-	pci {
+	pci@0 {
 		compatible = "pci-x86";
 		#address-cells = <3>;
 		#size-cells = <2>;
@@ -249,7 +249,7 @@
 			spd {
 				#address-cells = <1>;
 				#size-cells = <0>;
-				samsung_4 {
+				samsung_4@6 {
 					reg = <6>;
 					data = [91 20 f1 03 04 11 05 0b
 						03 11 01 08 0a 00 50 01
@@ -284,7 +284,7 @@
 						00 00 00 00 00 00 00 00
 						00 00 00 00 00 00 00 00];
 				};
-				hynix-h9ccnnnbltmlar-ntm-lpddr3-32 {
+				hynix-h9ccnnnbltmlar-ntm-lpddr3-32@8 {
 					/*
 					 * banks 8, ranks 2, rows 14,
 					 * columns 10, density 4096 mb, x32
@@ -323,7 +323,7 @@
 						00 00 00 00 00 00 00 00
 						00 00 00 00 00 00 00 00];
 					};
-				samsung_8 {
+				samsung_8@10 {
 					reg = <10>;
 					data = [91 20 f1 03 04 12 05 0a
 						03 11 01 08 0a 00 50 01
@@ -358,7 +358,7 @@
 						00 00 00 00 00 00 00 00
 						00 00 00 00 00 00 00 00];
 				};
-				hynix-h9ccnnnbltmlar-ntm-lpddr3-16 {
+				hynix-h9ccnnnbltmlar-ntm-lpddr3-16@12 {
 					/*
 					 * banks 8, ranks 2, rows 14,
 					 * columns 11, density 4096 mb, x16
@@ -397,7 +397,7 @@
 						00 00 00 00 00 00 00 00
 						00 00 00 00 00 00 00 00];
 				};
-				hynix-h9ccnnncltmlar-lpddr3 {
+				hynix-h9ccnnncltmlar-lpddr3@13 {
 					/*
 					 * banks 8, ranks 2, rows 15,
 					 * columns 11, density 8192 mb, x16
@@ -436,7 +436,7 @@
 						00 00 00 00 00 00 00 00
 						00 00 00 00 00 00 00 00];
 				};
-				elpida-edfb232a1ma {
+				elpida-edfb232a1ma@15 {
 					/*
 					 * banks 8, ranks 2, rows 15,
 					 * columns 11, density 8192 mb, x16
@@ -539,14 +539,14 @@
 					compatible = "winbond,w25q64",
 							"spi-flash";
 					memory-map = <0xff800000 0x00800000>;
-					rw-mrc-cache {
+					rw-mrc-cache@3e0000 {
 						label = "rw-mrc-cache";
 						reg = <0x003e0000 0x00010000>;
 					};
 				};
 			};
 
-			gpio_a: gpioa {
+			gpio_a: gpioa@0 {
 				compatible = "intel,broadwell-gpio";
 				u-boot,dm-pre-reloc;
 				#gpio-cells = <2>;
@@ -555,7 +555,7 @@
 				bank-name = "A";
 			};
 
-			gpio_b: gpiob {
+			gpio_b: gpiob@1 {
 				compatible = "intel,broadwell-gpio";
 				u-boot,dm-pre-reloc;
 				#gpio-cells = <2>;
@@ -564,7 +564,7 @@
 				bank-name = "B";
 			};
 
-			gpio_c: gpioc {
+			gpio_c: gpioc@2 {
 				compatible = "intel,broadwell-gpio";
 				u-boot,dm-pre-reloc;
 				#gpio-cells = <2>;
@@ -614,13 +614,13 @@
 		};
 	};
 
-	tpm {
+	tpm@fed40000 {
 		reg = <0xfed40000 0x5000>;
 		compatible = "infineon,slb9635lpc";
 	};
 
 	microcode {
-		update@0 {
+		update_1 {
 #include "microcode/mc0306d4_00000018.dtsi"
 		};
 	};
