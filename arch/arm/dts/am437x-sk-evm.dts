@@ -47,7 +47,7 @@
 			"Headphone Jack",       "HPROUT";
 	};
 
-	matrix_keypad: matrix_keypad@0 {
+	matrix_keypad: matrix_keypad {
 		compatible = "gpio-matrix-keypad";
 
 		pinctrl-names = "default";
@@ -76,28 +76,28 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&leds_pins>;
 
-		led@0 {
+		led_0 {
 			label = "am437x-sk:red:heartbeat";
 			gpios = <&gpio5 0 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 0 */
 			linux,default-trigger = "heartbeat";
 			default-state = "off";
 		};
 
-		led@1 {
+		led_1 {
 			label = "am437x-sk:green:mmc1";
 			gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 1 */
 			linux,default-trigger = "mmc0";
 			default-state = "off";
 		};
 
-		led@2 {
+		led_2 {
 			label = "am437x-sk:blue:cpu0";
 			gpios = <&gpio5 2 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 2 */
 			linux,default-trigger = "cpu0";
 			default-state = "off";
 		};
 
-		led@3 {
+		led_3 {
 			label = "am437x-sk:blue:usr3";
 			gpios = <&gpio5 3 GPIO_ACTIVE_HIGH>;	/* Bank 5, pin 3 */
 			default-state = "off";
@@ -667,7 +667,7 @@
 	pinctrl-0 = <&dss_pins>;
 
 	port {
-		dpi_out: endpoint@0 {
+		dpi_out: endpoint {
 			remote-endpoint = <&lcd_in>;
 			data-lines = <24>;
 		};
