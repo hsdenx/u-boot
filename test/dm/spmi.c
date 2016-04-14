@@ -21,7 +21,7 @@ DECLARE_GLOBAL_DATA_PTR;
 /* Test if bus childs got probed propperly*/
 static int dm_test_spmi_probe(struct unit_test_state *uts)
 {
-	const char *name = "spmi@0";
+	const char *name = "spmi0";
 	struct udevice *bus, *dev;
 
 	ut_assertok(uclass_get_device(UCLASS_SPMI, 0, &bus));

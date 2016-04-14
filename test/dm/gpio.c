@@ -183,7 +183,7 @@ static int dm_test_gpio_phandles(struct unit_test_state *uts)
 	struct udevice *dev, *gpio_a, *gpio_b;
 
 	ut_assertok(uclass_get_device(UCLASS_TEST_FDT, 0, &dev));
-	ut_asserteq_str("a-test", dev->name);
+	ut_asserteq_str("a-test@0", dev->name);
 
 	ut_assertok(gpio_request_by_name(dev, "test-gpios", 1, &desc, 0));
 	ut_assertok(uclass_get_device(UCLASS_GPIO, 1, &gpio_a));

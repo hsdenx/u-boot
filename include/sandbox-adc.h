@@ -8,7 +8,7 @@
 #ifndef _SANDBOX_ADC_H_
 #define _SANDBOX_ADC_H_
 
-#define SANDBOX_ADC_DEVNAME		"adc@0"
+#define SANDBOX_ADC_DEVNAME		"adc"
 #define SANDBOX_ADC_DATA_MASK		0xffff /* 16-bits resolution */
 #define SANDBOX_ADC_CHANNELS		4
 #define SANDBOX_ADC_CHANNEL0_DATA	0x0

@@ -26,7 +26,7 @@ DECLARE_GLOBAL_DATA_PTR;
 /* Test PMIC get method */
 static int dm_test_power_pmic_get(struct unit_test_state *uts)
 {
-	const char *name = "sandbox_pmic";
+	const char *name = "sandbox_pmic@40";
 	struct udevice *dev;
 
 	ut_assertok(pmic_get(name, &dev));
@@ -42,7 +42,7 @@ DM_TEST(dm_test_power_pmic_get, DM_TESTF_SCAN_FDT);
 /* Test PMIC I/O */
 static int dm_test_power_pmic_io(struct unit_test_state *uts)
 {
-	const char *name = "sandbox_pmic";
+	const char *name = "sandbox_pmic@40";
 	uint8_t out_buffer, in_buffer;
 	struct udevice *dev;
 	int reg_count, i;

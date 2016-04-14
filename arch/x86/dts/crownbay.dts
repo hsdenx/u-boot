@@ -59,12 +59,12 @@
 	};
 
 	microcode {
-		update@0 {
+		update_0 {
 #include "microcode/m0220661105_cv.dtsi"
 		};
 	};
 
-	pci {
+	pci@0 {
 		#address-cells = <3>;
 		#size-cells = <2>;
 		compatible = "pci-x86";
@@ -227,14 +227,14 @@
 				};
 			};
 
-			gpioa {
+			gpioa@0 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0 0x20>;
 				bank-name = "A";
 			};
 
-			gpiob {
+			gpiob@20 {
 				compatible = "intel,ich6-gpio";
 				u-boot,dm-pre-reloc;
 				reg = <0x20 0x20>;

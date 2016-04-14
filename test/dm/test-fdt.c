@@ -190,10 +190,10 @@ static int dm_test_fdt_uclass_seq(struct unit_test_state *uts)
 
 	/* A few basic santiy tests */
 	ut_assertok(uclass_find_device_by_seq(UCLASS_TEST_FDT, 3, true, &dev));
-	ut_asserteq_str("b-test", dev->name);
+	ut_asserteq_str("b-test@3", dev->name);
 
 	ut_assertok(uclass_find_device_by_seq(UCLASS_TEST_FDT, 8, true, &dev));
-	ut_asserteq_str("a-test", dev->name);
+	ut_asserteq_str("a-test@0", dev->name);
 
 	ut_asserteq(-ENODEV, uclass_find_device_by_seq(UCLASS_TEST_FDT, 5,
 						       true, &dev));
@@ -201,7 +201,7 @@ static int dm_test_fdt_uclass_seq(struct unit_test_state *uts)
 
 	/* Test aliases */
 	ut_assertok(uclass_get_device_by_seq(UCLASS_TEST_FDT, 6, &dev));
-	ut_asserteq_str("e-test", dev->name);
+	ut_asserteq_str("e-test@3", dev->name);
 
 	ut_asserteq(-ENODEV, uclass_find_device_by_seq(UCLASS_TEST_FDT, 7,
 						       true, &dev));
@@ -211,18 +211,18 @@ static int dm_test_fdt_uclass_seq(struct unit_test_state *uts)
 	 * node
 	 */
 	ut_assertok(uclass_get_device_by_seq(UCLASS_TEST_FDT, 3, &dev));
-	ut_asserteq_str("b-test", dev->name);
+	ut_asserteq_str("b-test@3", dev->name);
 
 	/*
 	 * d-test wants sequence number 3 also, but it can't have it because
 	 * b-test gets it first.
 	 */
 	ut_assertok(uclass_get_device(UCLASS_TEST_FDT, 2, &dev));
-	ut_asserteq_str("d-test", dev->name);
+	ut_asserteq_str("d-test@3", dev->name);
 
 	/* d-test actually gets 0 */
 	ut_assertok(uclass_get_device_by_seq(UCLASS_TEST_FDT, 0, &dev));
-	ut_asserteq_str("d-test", dev->name);
+	ut_asserteq_str("d-test@3", dev->name);
 
 	/* initially no one wants seq 1 */
 	ut_asserteq(-ENODEV, uclass_get_device_by_seq(UCLASS_TEST_FDT, 1,
@@ -245,11 +245,11 @@ static int dm_test_fdt_offset(struct unit_test_state *uts)
 	struct udevice *dev;
 	int node;
 
-	node = fdt_path_offset(blob, "/e-test");
+	node = fdt_path_offset(blob, "/e-test@3");
 	ut_assert(node > 0);
 	ut_assertok(uclass_get_device_by_of_offset(UCLASS_TEST_FDT, node,
 						   &dev));
-	ut_asserteq_str("e-test", dev->name);
+	ut_asserteq_str("e-test@3", dev->name);
 
 	/* This node should not be bound */
 	node = fdt_path_offset(blob, "/junk");

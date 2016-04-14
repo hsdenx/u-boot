@@ -156,9 +156,9 @@ static int dm_test_bus_children_funcs(struct unit_test_state *uts)
 	ut_asserteq(-ENODEV, device_get_child_by_seq(bus, 2, &dev));
 
 	/* Looking for something that is not a child */
-	node = fdt_path_offset(blob, "/junk");
+	node = fdt_path_offset(blob, "/junk@1");
 	ut_asserteq(-ENODEV, device_find_child_by_of_offset(bus, node, &dev));
-	node = fdt_path_offset(blob, "/d-test");
+	node = fdt_path_offset(blob, "/d-test@3");
 	ut_asserteq(-ENODEV, device_find_child_by_of_offset(bus, node, &dev));
 
 	/* Find a valid child */

@@ -1,5 +1,5 @@
 / {
-	serial: serial {
+	serial: serial@3f8 {
 		compatible = "ns16550";
 		reg = <0x3f8 8>;
 		reg-shift = <0>;
