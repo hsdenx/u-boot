@@ -51,7 +51,7 @@
 			     <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
 	};
 
-	ocp {
+	ocp@0 {
 		omap_dwc3_4: omap_dwc3_4@48940000 {
 			compatible = "ti,dwc3";
 			ti,hwmods = "usb_otg_ss4";

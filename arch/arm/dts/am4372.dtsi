@@ -67,7 +67,7 @@
 		cache-level = <2>;
 	};
 
-	ocp {
+	ocp@0 {
 		compatible = "ti,am4372-l3-noc", "simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
@@ -559,12 +559,12 @@
 				status = "disabled";
 			};
 
-			cpsw_emac0: slave@4a100200 {
+			cpsw_emac0: slave_4a100200 {
 				/* Filled in by U-Boot */
 				mac-address = [ 00 00 00 00 00 00 ];
 			};
 
-			cpsw_emac1: slave@4a100300 {
+			cpsw_emac1: slave_4a100300 {
 				/* Filled in by U-Boot */
 				mac-address = [ 00 00 00 00 00 00 ];
 			};
@@ -821,7 +821,7 @@
 			reg-names = "power";
 		};
 
-		ocp2scp0: ocp2scp@483a8000 {
+		ocp2scp0: ocp2scp_483a8000 {
 			compatible = "ti,am437x-ocp2scp", "ti,omap-ocp2scp";
 			#address-cells = <1>;
 			#size-cells = <1>;
@@ -840,7 +840,7 @@
 			};
 		};
 
-		ocp2scp1: ocp2scp@483e8000 {
+		ocp2scp1: ocp2scp_483e8000 {
 			compatible = "ti,am437x-ocp2scp", "ti,omap-ocp2scp";
 			#address-cells = <1>;
 			#size-cells = <1>;
