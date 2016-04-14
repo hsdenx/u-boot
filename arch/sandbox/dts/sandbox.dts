@@ -34,13 +34,13 @@
 			#size-cells = <1>;
 
 			/* Information for sandbox */
-			ro {
+			ro@0 {
 				reg = <0 0xf000>;
 			};
-			wp-ro {
+			wp-ro@f000 {
 				reg = <0xf000 0x1000>;
 			};
-			rw {
+			rw@10000 {
 				reg = <0x10000 0x10000>;
 			};
 		};
@@ -64,7 +64,7 @@
 		host-raw-interface = "lo";
 	};
 
-	gpio_a: gpios@0 {
+	gpio_a: gpios_0 {
 		gpio-controller;
 		compatible = "sandbox,gpio";
 		#gpio-cells = <1>;
@@ -72,7 +72,7 @@
 		num-gpios = <20>;
 	};
 
-	gpio_b: gpios@1 {
+	gpio_b: gpios_1 {
 		gpio-controller;
 		compatible = "sandbox,gpio";
 		#gpio-cells = <2>;
@@ -111,7 +111,7 @@
 				compatible = "sandbox,i2c-rtc";
 			};
 		};
-		sandbox_pmic: sandbox_pmic {
+		sandbox_pmic: sandbox_pmic@40 {
 			reg = <0x40>;
 		};
 	};
@@ -123,7 +123,7 @@
 		yres = <768>;
 	};
 
-	pci: pci-controller {
+	pci: pci-controller@0 {
 		compatible = "sandbox,pci";
 		device_type = "pci";
 		#address-cells = <3>;
@@ -133,7 +133,7 @@
 		pci@1f,0 {
 			compatible = "pci-generic";
 			reg = <0xf800 0 0 0 0>;
-			emul@1f,0 {
+			emul_1f,0 {
 				compatible = "sandbox,swap-case";
 			};
 		};
@@ -154,7 +154,7 @@
 		};
 	};
 
-	reset@1 {
+	reset {
 		compatible = "sandbox,reset";
 	};
 
@@ -203,21 +203,21 @@
 		pinctrl-0 = <&pinctrl_serial0>;
 	};
 
-	usb@0 {
+	usb0 {
 		compatible = "sandbox,usb";
 		status = "disabled";
 		hub {
 			compatible = "sandbox,usb-hub";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			flash-stick {
+			flash-stick@0 {
 				reg = <0>;
 				compatible = "sandbox,usb-flash";
 			};
 		};
 	};
 
-	usb@1 {
+	usb1 {
 		compatible = "sandbox,usb";
 		hub {
 			compatible = "usb-hub";
@@ -226,7 +226,7 @@
 				compatible = "sandbox,usb-hub";
 				#address-cells = <1>;
 				#size-cells = <0>;
-				flash-stick {
+				flash-stick@0 {
 					reg = <0>;
 					compatible = "sandbox,usb-flash";
 					sandbox,filepath = "flash.bin";
@@ -235,12 +235,12 @@
 		};
 	};
 
-	usb@2 {
+	usb2 {
 		compatible = "sandbox,usb";
 		status = "disabled";
 	};
 
-	spmi: spmi@0 {
+	spmi: spmi0 {
 		compatible = "sandbox,spmi";
 		#address-cells = <0x1>;
 		#size-cells = <0x1>;

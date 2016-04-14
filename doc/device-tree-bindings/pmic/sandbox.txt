@@ -24,7 +24,7 @@ Optional subnodes:
 
 Example:
 
-sandbox_pmic {
+sandbox_pmic@40 {
 	compatible = "sandbox,pmic";
 	reg = <0x40>;
 

@@ -18,19 +18,19 @@
 		rtc0 = &rtc_0;
 		rtc1 = &rtc_1;
 		spi0 = "/spi@0";
-		testfdt6 = "/e-test";
-		testbus3 = "/some-bus";
-		testfdt0 = "/some-bus/c-test@0";
-		testfdt1 = "/some-bus/c-test@1";
-		testfdt3 = "/b-test";
-		testfdt5 = "/some-bus/c-test@5";
-		testfdt8 = "/a-test";
+		testfdt6 = "/e-test@3";
+		testbus3 = "/some-bus@3";
+		testfdt0 = "/some-bus@3/c-test@0";
+		testfdt1 = "/some-bus@3/c-test@1";
+		testfdt3 = "/b-test@3";
+		testfdt5 = "/some-bus@3/c-test@5";
+		testfdt8 = "/a-test@0";
 		usb0 = &usb_0;
 		usb1 = &usb_1;
 		usb2 = &usb_2;
 	};
 
-	a-test {
+	a-test@0 {
 		reg = <0 1>;
 		compatible = "denx,u-boot-fdt-test";
 		ping-expect = <0>;
@@ -43,23 +43,23 @@
 			<&gpio_b 9 0xc 3 2 1>;
 	};
 
-	junk {
+	junk@1 {
 		reg = <1 1>;
 		compatible = "not,compatible";
 	};
 
-	no-compatible {
+	no-compatible@2 {
 		reg = <2 1>;
 	};
 
-	b-test {
+	b-test@3 {
 		reg = <3 1>;
 		compatible = "denx,u-boot-fdt-test";
 		ping-expect = <3>;
 		ping-add = <3>;
 	};
 
-	some-bus {
+	some-bus@3 {
 		#address-cells = <1>;
 		#size-cells = <0>;
 		compatible = "denx,u-boot-test-bus";
@@ -86,14 +86,14 @@
 		};
 	};
 
-	d-test {
+	d-test@3 {
 		reg = <3 1>;
 		ping-expect = <6>;
 		ping-add = <6>;
 		compatible = "google,another-fdt-test";
 	};
 
-	e-test {
+	e-test@3 {
 		reg = <3 1>;
 		ping-expect = <6>;
 		ping-add = <6>;
@@ -108,7 +108,7 @@
 		compatible = "denx,u-boot-fdt-test";
 	};
 
-	clk@0 {
+	clk {
 		compatible = "sandbox,clk";
 	};
 
@@ -124,7 +124,7 @@
 		fake-host-hwaddr = <0x00 0x00 0x66 0x44 0x22 0x11>;
 	};
 
-	eth_3: sbe5 {
+	eth_3: sbe5@10005000 {
 		compatible = "sandbox,eth";
 		reg = <0x10005000 0x1000>;
 		fake-host-hwaddr = <0x00 0x00 0x66 0x44 0x22 0x33>;
@@ -184,12 +184,12 @@
 			};
 		};
 
-		sandbox_pmic: sandbox_pmic {
+		sandbox_pmic: sandbox_pmic@40 {
 			reg = <0x40>;
 		};
 	};
 
-	adc@0 {
+	adc {
 		compatible = "sandbox,adc";
 		vdd-supply = <&buck2>;
 		vss-microvolts = <0>;
@@ -220,7 +220,7 @@
 		compatible = "sandbox,mmc";
 	};
 
-	pci: pci-controller {
+	pci: pci-controller@0 {
 		compatible = "sandbox,pci";
 		device_type = "pci";
 		#address-cells = <3>;
@@ -230,7 +230,7 @@
 		pci@1f,0 {
 			compatible = "pci-generic";
 			reg = <0xf800 0 0 0 0>;
-			emul@1f,0 {
+			emul_1f,0 {
 				compatible = "sandbox,swap-case";
 			};
 		};
@@ -240,20 +240,20 @@
 		compatible = "sandbox,ram";
 	};
 
-	reset@0 {
+	reset0 {
 		compatible = "sandbox,warm-reset";
 	};
 
-	reset@1 {
+	reset1 {
 		compatible = "sandbox,reset";
 	};
 
-	rproc_1: rproc@1 {
+	rproc_1: rproc1 {
 		compatible = "sandbox,test-processor";
 		remoteproc-name = "remoteproc-test-dev1";
 	};
 
-	rproc_2: rproc@2 {
+	rproc_2: rproc2 {
 		compatible = "sandbox,test-processor";
 		internal-memory-mapped;
 		remoteproc-name = "remoteproc-test-dev2";
@@ -296,21 +296,21 @@
 		u-boot,dm-pre-reloc;
 	};
 
-	usb_0: usb@0 {
+	usb_0: usb0 {
 		compatible = "sandbox,usb";
 		status = "disabled";
 		hub {
 			compatible = "sandbox,usb-hub";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			flash-stick {
+			flash-stick@0 {
 				reg = <0>;
 				compatible = "sandbox,usb-flash";
 			};
 		};
 	};
 
-	usb_1: usb@1 {
+	usb_1: usb1 {
 		compatible = "sandbox,usb";
 		hub {
 			compatible = "usb-hub";
@@ -346,12 +346,12 @@
 		};
 	};
 
-	usb_2: usb@2 {
+	usb_2: usb2 {
 		compatible = "sandbox,usb";
 		status = "disabled";
 	};
 
-	spmi: spmi@0 {
+	spmi: spmi0 {
 		compatible = "sandbox,spmi";
 		#address-cells = <0x1>;
 		#size-cells = <0x1>;

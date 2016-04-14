@@ -1038,11 +1038,11 @@ int cros_ec_decode_ec_flash(const void *blob, int node,
 		const char *name = fdt_get_name(blob, node, NULL);
 		enum ec_flash_region region;
 
-		if (0 == strcmp(name, "ro")) {
+		if (0 == strcmp(name, "ro@0")) {
 			region = EC_FLASH_REGION_RO;
-		} else if (0 == strcmp(name, "rw")) {
+		} else if (0 == strcmp(name, "rw@10000")) {
 			region = EC_FLASH_REGION_RW;
-		} else if (0 == strcmp(name, "wp-ro")) {
+		} else if (0 == strcmp(name, "wp-ro@f000")) {
 			region = EC_FLASH_REGION_WP_RO;
 		} else {
 			debug("Unknown EC flash region name '%s'\n", name);
