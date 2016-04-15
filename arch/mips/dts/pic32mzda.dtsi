@@ -27,7 +27,7 @@
 	};
 
 	cpus {
-		cpu@0 {
+		cpu {
 			compatible = "mips,mips14kc";
 		};
 	};
