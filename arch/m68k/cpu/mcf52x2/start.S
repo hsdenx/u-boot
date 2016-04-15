@@ -198,8 +198,8 @@ _after_flashbar_copy:
 
 	move.l #__got_start, %a5		/* put relocation table address to a5 */
 
-	bsr cpu_init_f				/* run low-level CPU init code (from flash) */
-	bsr board_init_f			/* run low-level board init code (from flash) */
+	jbsr cpu_init_f				/* run low-level CPU init code (from flash) */
+	jbsr board_init_f			/* run low-level board init code (from flash) */
 
 	/* board_init_f() does not return */
 
