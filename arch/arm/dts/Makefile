@@ -234,7 +234,8 @@ dtb-$(CONFIG_SOC_KEYSTONE) += k2hk-evm.dtb \
 targets += $(dtb-y)
 
 # Add any required device tree compiler flags here
-DTC_FLAGS +=
+# Disable noisy checks by default
+DTC_FLAGS += -Wno-unit_address_vs_reg
 
 PHONY += dtbs
 dtbs: $(addprefix $(obj)/, $(dtb-y))
