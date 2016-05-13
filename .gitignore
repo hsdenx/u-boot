@@ -32,6 +32,7 @@
 #
 /MLO*
 /SPL
+/SPL.imx
 /System.map
 /u-boot*
 /boards.cfg
