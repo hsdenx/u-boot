@@ -341,7 +341,7 @@ struct mxc_ccm_reg {
 #define MXC_CCM_CSCMR2_ESAI_PRE_SEL_OFFSET		19
 #define MXC_CCM_CSCMR2_LDB_DI1_IPU_DIV			(1 << 11)
 #define MXC_CCM_CSCMR2_LDB_DI0_IPU_DIV			(1 << 10)
-/* CSCMR1_CAN_CLK exists on i.MX6SX/QP */
+/* CSCMR2_CAN_CLK bits exist on i.MX6S/SX/DL/Q/QD */
 #define MXC_CCM_CSCMR2_CAN_CLK_SEL_MASK			(0x3 << 8)
 #define MXC_CCM_CSCMR2_CAN_CLK_SEL_OFFSET		8
 

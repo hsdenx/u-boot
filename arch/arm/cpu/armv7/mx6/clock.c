@@ -132,6 +132,16 @@ void enable_uart_clk(unsigned char enable)
 }
 #endif
 
+#ifdef CONFIG_IMX6_CAN_CLK_INIT
+/* div can be from 1 ~ 64 */
+void set_can_clk(u32 div)
+{
+	clrsetbits_le32(&imx_ccm->cscmr2,
+			MXC_CCM_CSCMR2_CAN_CLK_PODF_MASK,
+			(div - 1) << MXC_CCM_CSCMR2_CAN_CLK_PODF_OFFSET);
+}
+#endif
+
 #ifdef CONFIG_MMC
 int enable_usdhc_clk(unsigned char enable, unsigned bus_num)
 {
@@ -207,6 +217,7 @@ int enable_spi_clk(unsigned char enable, unsigned spi_num)
 	__raw_writel(reg, &imx_ccm->CCGR1);
 	return 0;
 }
+
 static u32 decode_pll(enum pll_clocks pll, u32 infreq)
 {
 	u32 div, test_div, pll_num, pll_denom;
@@ -426,6 +437,17 @@ static u32 get_cspi_clk(void)
 	}
 
 	return	decode_pll(PLL_USBOTG, MXC_HCLK) / (8 * (cspi_podf + 1));
+}
+
+static u32 get_can_clk(void)
+{
+	u32 reg, can_podf;
+
+	reg = __raw_readl(&imx_ccm->cscmr2);
+	reg &= MXC_CCM_CSCMR2_CAN_CLK_PODF_MASK;
+	can_podf = reg >> MXC_CCM_CSCMR2_CAN_CLK_PODF_OFFSET;
+	/* can clock is derived from PLL3 which is referred to PLL_USBOTG */
+	return	decode_pll(PLL_USBOTG, MXC_HCLK) / (8 * (can_podf + 1));
 }
 
 static u32 get_axi_clk(void)
@@ -1175,6 +1197,8 @@ unsigned int mxc_get_clock(enum mxc_clock clk)
 		return get_usdhc_clk(3);
 	case MXC_SATA_CLK:
 		return get_ahb_clk();
+	case MXC_CAN_CLK:
+		return get_can_clk();
 	default:
 		printf("Unsupported MXC CLK: %d\n", clk);
 		break;
@@ -1205,6 +1229,7 @@ int do_mx6_showclocks(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 #ifdef CONFIG_MXC_SPI
 	printf("CSPI       %8d kHz\n", mxc_get_clock(MXC_CSPI_CLK) / 1000);
 #endif
+	printf("CAN        %8d kHz\n", mxc_get_clock(MXC_CAN_CLK) / 1000);
 	printf("AHB        %8d kHz\n", mxc_get_clock(MXC_AHB_CLK) / 1000);
 	printf("AXI        %8d kHz\n", mxc_get_clock(MXC_AXI_CLK) / 1000);
 	printf("DDR        %8d kHz\n", mxc_get_clock(MXC_DDR_CLK) / 1000);

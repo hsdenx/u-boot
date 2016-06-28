@@ -276,4 +276,22 @@ source "board/udoo/neo/Kconfig"
 source "board/wandboard/Kconfig"
 source "board/warp/Kconfig"
 
+config IMX6_CAN_CLK_INIT
+	bool "Change CAN clock divider"
+	default n
+	help
+		Enable this option to change the CAN clock.
+
+		The CAN clock is derived from PLL3_60M (60 MHz, derived from PLL3
+		with fixed divider of 8) with an adjustable divider. By default,
+		the value of the divider is 2. So the default CAN clock is 30 Mhz.
+
+config IMX6_CAN_CLK_DIV
+	int "IMX6 CAN clock divider"
+	depends on IMX6_CAN_CLK_INIT
+	range 1 64
+	default 2
+	help
+		CAN clock divider may be from 1 to 64.
+
 endif

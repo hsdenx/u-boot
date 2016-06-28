@@ -40,6 +40,7 @@ enum mxc_clock {
 	MXC_SATA_CLK,
 	MXC_NFC_CLK,
 	MXC_I2C_CLK,
+	MXC_CAN_CLK,
 };
 
 enum ldb_di_clock {
@@ -65,6 +66,7 @@ void hab_caam_clock_enable(unsigned char enable);
 void enable_ocotp_clk(unsigned char enable);
 void enable_usboh3_clk(unsigned char enable);
 void enable_uart_clk(unsigned char enable);
+void set_can_clk(u32 div);
 int enable_usdhc_clk(unsigned char enable, unsigned bus_num);
 int enable_sata_clock(void);
 void disable_sata_clock(void);
