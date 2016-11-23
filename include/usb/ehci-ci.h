@@ -281,6 +281,8 @@ struct usb_ehci {
 #define MXC_EHCI_IPPUE_UP		(1 << 11)
 
 int usb_phy_mode(int port);
+void usb_phy_set_tx_ctrl(int index, u8 dp, u8 dn, u8 cal);
+
 /* Board-specific initialization */
 int board_ehci_hcd_init(int port);
 int board_usb_phy_mode(int port);

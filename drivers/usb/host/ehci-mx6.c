@@ -27,6 +27,47 @@
 
 #define USB_H1_CTRL_OFFSET	0x04
 
+#define USBPHY_TX				0x00000010
+#define BP_USBPHY_TX_RSVD5			29
+#define BM_USBPHY_TX_RSVD5			0xE0000000
+#define BF_USBPHY_TX_RSVD5(v) \
+	(((v) << BP_USBPHY_TX_RSVD5) & BM_USBPHY_TX_RSVD5)
+#define BP_USBPHY_TX_USBPHY_TX_EDGECTRL		26
+#define BM_USBPHY_TX_USBPHY_TX_EDGECTRL		0x1C000000
+#define BF_USBPHY_TX_USBPHY_TX_EDGECTRL(v) \
+	(((v) << BP_USBPHY_TX_USBPHY_TX_EDGECTRL) & \
+	 BM_USBPHY_TX_USBPHY_TX_EDGECTRL)
+#define BM_USBPHY_TX_USBPHY_TX_SYNC_INVERT	0x02000000
+#define BM_USBPHY_TX_USBPHY_TX_SYNC_MUX		0x01000000
+#define BP_USBPHY_TX_RSVD4			22
+#define BM_USBPHY_TX_RSVD4			0x00C00000
+#define BF_USBPHY_TX_RSVD4(v) \
+	(((v) << BP_USBPHY_TX_RSVD4) & BM_USBPHY_TX_RSVD4)
+#define BM_USBPHY_TX_TXENCAL45DP		0x00200000
+#define BM_USBPHY_TX_RSVD3			0x00100000
+#define BP_USBPHY_TX_TXCAL45DP			16
+#define BM_USBPHY_TX_TXCAL45DP			0x000F0000
+#define BF_USBPHY_TX_TXCAL45DP(v) \
+	(((v) << BP_USBPHY_TX_TXCAL45DP) & BM_USBPHY_TX_TXCAL45DP)
+#define BP_USBPHY_TX_RSVD2			14
+#define BM_USBPHY_TX_RSVD2			0x0000C000
+#define BF_USBPHY_TX_RSVD2(v) \
+	(((v) << BP_USBPHY_TX_RSVD2) & BM_USBPHY_TX_RSVD2)
+#define BM_USBPHY_TX_TXENCAL45DN		0x00002000
+#define BM_USBPHY_TX_RSVD1			0x00001000
+#define BP_USBPHY_TX_TXCAL45DN			8
+#define BM_USBPHY_TX_TXCAL45DN			0x00000F00
+#define BF_USBPHY_TX_TXCAL45DN(v) \
+	(((v) << BP_USBPHY_TX_TXCAL45DN) & BM_USBPHY_TX_TXCAL45DN)
+#define BP_USBPHY_TX_RSVD0			4
+#define BM_USBPHY_TX_RSVD0			0x000000F0
+#define BF_USBPHY_TX_RSVD0(v) \
+	(((v) << BP_USBPHY_TX_RSVD0) & BM_USBPHY_TX_RSVD0)
+#define BP_USBPHY_TX_D_CAL			0
+#define BM_USBPHY_TX_D_CAL			0x0000000F
+#define BF_USBPHY_TX_D_CAL(v) \
+	(((v) << BP_USBPHY_TX_D_CAL) & BM_USBPHY_TX_D_CAL)
+
 #define USBPHY_CTRL				0x00000030
 #define USBPHY_CTRL_SET				0x00000034
 #define USBPHY_CTRL_CLR				0x00000038
@@ -117,6 +158,25 @@ static void usb_power_config(int index)
 		     ANADIG_USB2_PLL_480_CTRL_POWER |
 		     ANADIG_USB2_PLL_480_CTRL_EN_USB_CLKS,
 		     pll_480_ctrl_set);
+}
+
+void usb_phy_set_tx_ctrl(int index, u8 dp, u8 dn, u8 cal)
+{
+	void __iomem *phy_reg;
+	void __iomem *phy_ctrl;
+	u32 clear, set;
+
+	if (index >= ARRAY_SIZE(phy_bases))
+		return;
+
+	phy_reg = (void __iomem *)phy_bases[index];
+	phy_ctrl = (void __iomem *)(phy_reg + USBPHY_TX);
+
+	clear = BM_USBPHY_TX_TXCAL45DP | BM_USBPHY_TX_TXCAL45DN |
+		BM_USBPHY_TX_D_CAL;
+	set = BF_USBPHY_TX_TXCAL45DP(dp) | BF_USBPHY_TX_TXCAL45DN(dn) |
+		BF_USBPHY_TX_D_CAL(cal);
+	clrsetbits_le32(phy_ctrl, clear, set);
 }
 
 /* Return 0 : host node, <>0 : device mode */
